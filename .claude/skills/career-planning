@@ -1,0 +1,132 @@
+---
+name: career-planning
+description: Produce a structured career trajectory plan that maps a user's current state to a target role or outcome over a specified time horizon, including realistic milestones, skill-building priorities, and moves likely to accelerate or stall the progression. Use this skill whenever the user asks for career planning help, including requests like "help me plan my path to VP", "what do I need to do to become a Staff Engineer", "map my next 3 years", "how do I get from Senior to Director", or "plan my career from here to [target]". Includes the career-move frameworks (lateral vs. vertical, T-shape vs. stack, IC vs. management tracks) that prevent generic "build more skills and network" output.
+---
+
+# Career Planning
+
+A generic career plan isn't useful. "Build more skills, expand your network, seek stretch opportunities" applies to everyone and helps no one. This skill exists to produce plans that are specific enough to act on this week, not just aspire to this year.
+
+## Before planning, gather the inputs
+
+A useful career plan needs four inputs. If any are missing from the user's profile or request, ask for them before planning.
+
+1. **Current state**: current title, current company (with rough size/stage), years of experience in the field, years at current level.
+2. **Target state**: target role (specific title), target time horizon (2 years, 5 years, "eventually"), target context if known (same company, bigger company, smaller company, different industry).
+3. **Constraints**: geographic constraints, compensation floor, lifestyle constraints (e.g., "not willing to travel more than 25%"), personal dealbreakers.
+4. **Leverage points**: what the user currently has going for them (strong network in a specific space, a rare technical skill, a recent high-profile outcome, a credential).
+
+If any input is unclear, ask for it. A plan built on guesses is worse than a plan that starts with "I need to know X first."
+
+## The frameworks
+
+Real career planning requires knowing which framework applies to the user's situation. Most career questions can be mapped to one of these.
+
+### IC track vs. management track
+
+These diverge significantly at the Senior level and beyond. The plan for someone targeting Staff Engineer is different from the plan for someone targeting Engineering Manager, even if they're starting from the same Senior IC role.
+
+- **IC track progression**: Senior → Staff → Senior Staff → Principal → Distinguished. Primary metric: technical impact at scale, cross-org influence, architectural judgment.
+- **Management track progression**: Senior → Manager → Senior Manager → Director → Senior Director → VP. Primary metric: team outcomes, org size, strategic leadership.
+
+**Switching tracks is expensive and gets more expensive with seniority.** A Senior IC can still go to Manager without much cost. A Staff Engineer going to Engineering Manager often takes a perceived step back. Name the cost explicitly when it applies.
+
+### Lateral vs. vertical moves
+
+A common planning mistake is optimizing only for the next promotion. Lateral moves often accelerate careers more than vertical ones, especially:
+
+- **Lateral to a better-positioned company** (same title, but company with more visibility, better talent, or more growth)
+- **Lateral to a domain where the user has a compounding advantage** (same title, but where existing skills become rarer and more valued)
+- **Lateral to a role with better downstream optionality** (same title, but the next move up from here is bigger than the next move up from where you are)
+
+When planning multi-year trajectories, explicitly include lateral moves as options, not just promotions.
+
+### T-shape vs. stack
+
+For ICs specifically:
+
+- **T-shape**: broad competence across adjacent skills with deep expertise in one area. Good for generalist senior roles, most product management, early-stage startup roles.
+- **Stack**: deep expertise in a specific vertical area, shallow elsewhere. Good for specialized roles, platform/infrastructure, domains with steep expertise curves (security, ML research, distributed systems).
+
+Different target roles reward different shapes. Don't recommend "build a T-shape" generically; recommend the shape that matches the target.
+
+### Realistic time expectations for transitions
+
+| Transition | Typical time | Notes |
+|---|---|---|
+| Senior → Staff IC | 3–5 years | Faster at high-growth companies, slower at mature ones |
+| Senior → Manager | 1–3 years | Often faster than IC progression; more supply/demand driven |
+| Manager → Senior Manager | 2–4 years | Requires team outcomes and promotion decisions under your belt |
+| Senior Manager → Director | 3–5 years | Requires scope expansion or strategic wins |
+| Director → VP | 3–7 years | Often requires a company change |
+| Individual → Executive (C-suite) | 10+ years | Rarely predictable; usually requires M&A, founding, or unusual positioning |
+
+These are medians, not guarantees. **Plans that assume faster-than-median progression without a specific lever for it are fantasy plans.** Name the lever or adjust the timeline.
+
+## Plan structure
+
+A career plan in this tool has four sections.
+
+### 1. The honest assessment
+
+2–4 sentences. Where the user currently stands, what the target realistically requires, and whether the stated time horizon is aggressive, reasonable, or slow. If the target is genuinely unrealistic given the time horizon, say so. Don't soften it into a fantasy plan.
+
+**Example:**
+> You're currently a Senior Engineer at a Series B company with 6 years of experience. The target — Staff Engineer at a FAANG-tier company within 2 years — is aggressive but plausible. It will require either (a) a strong promo case at your current company in the next 12 months and then a lateral move, or (b) a direct jump into an L5→L6 role at FAANG, which is a high bar. The plan below assumes path (a) as the higher-probability route.
+
+### 2. The milestones
+
+3–6 concrete milestones, each with a rough timing and success criterion. Milestones should be things the user can verify from the outside — not "build deeper technical skills" but "ship a major project that demonstrates cross-team scope."
+
+**Format each milestone as:**
+- **Title** (6-10 words)
+- **Timing** (quarter or half-year range)
+- **Success criterion** (how you'll know it happened)
+- **Why it matters** (what this unlocks for the trajectory)
+
+### 3. The skill-building priorities
+
+2–4 specific skill areas to develop, not 10. Each one should tie to a concrete gap between current state and target state.
+
+For each priority, specify:
+- **The skill or skill area**
+- **Why it's a gap** (what target-role responsibility requires this)
+- **How to build it** — specific actions, not "take a course"
+- **How to demonstrate it** — how the user will prove they have the skill to future hiring managers
+
+### 4. The likely failure modes
+
+What could derail the plan? 2–3 realistic risks with mitigations. This section matters because it differentiates a plan from a wishlist.
+
+**Examples of good failure-mode entries:**
+- "Risk: Your current company gets acquired in Year 1, derailing the promo path. Mitigation: maintain active conversations with 2-3 target companies in case a lateral move becomes the better option."
+- "Risk: You develop strong people-management skills through this plan and realize you prefer that track. Mitigation: build in a 12-month checkpoint to reassess track choice explicitly."
+
+## Anti-patterns to avoid
+
+- **Generic skill-building advice**: "Work on your leadership skills" means nothing. Name the specific leadership situation and the behavior to practice in it.
+- **Plans without failure modes**: A plan that only describes the success path is a fantasy, not a plan.
+- **Timelines without levers**: "Become VP in 3 years" with no specific path is not planning, it's wishful thinking.
+- **Ignoring track constraints**: Recommending someone target CTO when they've been an IC their whole career without addressing the management experience gap is malpractice.
+- **Over-indexing on the user's stated target**: If the user's target is unrealistic, a good plan names that before planning around it.
+
+## Calibrating honesty
+
+Career planning requires some bluntness to be useful. But bluntness without care is just rudeness. The calibration:
+
+- **Be direct about time expectations** — understating timelines wastes the user's years.
+- **Be direct about track costs** — switching tracks is expensive; the user should know before they plan.
+- **Be direct about market realities** — if the target role typically requires something the user doesn't have (Stanford credential, FAANG pedigree, specific domain experience), name it as a factor, not as a dealbreaker.
+- **Don't project emotion onto the user** — avoid "this will be hard but rewarding" framing. State facts; let the user feel what they feel.
+- **Don't moralize about career choices** — the IC vs. management choice has no right answer; present tradeoffs, don't prescribe.
+
+## Before delivering output
+
+Run this checklist:
+
+1. **Every milestone has a success criterion an outside observer could verify.**
+2. **The time horizon is realistic for the transition, or the plan names the specific lever that makes it faster.**
+3. **Skill-building priorities are specific to the gap, not generic.**
+4. **Failure modes are included and specific.**
+5. **No generic advice that would apply to any professional.**
+6. **The plan fits on one screen** — multi-page plans don't get acted on. Aim for ~600-900 words total across all four sections.

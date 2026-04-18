@@ -1,0 +1,238 @@
+---
+name: scoring-rubrics
+description: Score a professional profile (resume or LinkedIn) against a consistent, deterministic rubric and produce an overall score, dimension sub-scores, and a ranked list of specific improvement recommendations. Use this skill whenever the user asks for a career health analysis, profile score, resume score, LinkedIn score, or any ask framed as "how good is my profile", "what's my score", "analyze my resume", "what should I fix", "rate my LinkedIn", or "give me a career health check". Also use it as the authoritative rubric when any other skill or prompt needs to evaluate profile quality — the rubrics here are the single source of truth for this tool and must be followed literally to keep scores consistent across runs.
+---
+
+# Scoring Rubrics
+
+This skill exists to make profile scoring **deterministic**. The biggest AI risk in a scoring feature is that the same profile gets different scores on different runs, which destroys the value of score history and trend-based recommendations.
+
+The rules here are intentionally mechanical. Follow them literally, not interpretively.
+
+## Two rubrics, not one
+
+Resume and LinkedIn are scored with separate rubrics because they measure different things.
+
+- **Resume rubric**: completeness, content quality, skills currency
+- **LinkedIn rubric**: headline optimization, About hook strength, experience voice, skills curation, completeness
+
+Always produce two distinct scores with distinct dimension breakdowns. Never produce a single unified "career health" number — the panel specifically rejected that framing.
+
+## Output format
+
+Both rubrics produce output in this exact JSON shape:
+
+```json
+{
+  "surface": "resume" | "linkedin",
+  "overall": 0-100,
+  "dimensions": {
+    "<dimension_name>": {
+      "score": 0-100,
+      "band": "weak" | "developing" | "solid" | "strong",
+      "evidence": "1-2 sentence citation of what earned this score"
+    }
+  },
+  "recommendations": [
+    {
+      "priority": 1-5,
+      "dimension": "<dimension_name>",
+      "title": "Short action title (< 60 chars)",
+      "body": "2-3 sentence concrete action the user can take",
+      "expected_impact": "low" | "medium" | "high"
+    }
+  ]
+}
+```
+
+The `overall` score is a weighted average of the dimension scores. Weights are specified per rubric below.
+
+## The bands (used for both rubrics)
+
+| Band | Score range | Meaning |
+|---|---|---|
+| Weak | 0–49 | Significant gap; a recruiter or reader would notice this is missing or underdone |
+| Developing | 50–69 | Present but not strong; the basics are covered but the quality is forgettable |
+| Solid | 70–84 | Good. A recruiter reading this thinks "this person is competent." No red flags. |
+| Strong | 85–100 | Excellent. The content itself is an advertisement for the candidate. |
+
+Most real profiles score in the 55–75 range. Scores above 85 require genuine excellence, not just absence of errors. Scores below 50 require a real, specific problem.
+
+---
+
+## Resume rubric
+
+Three dimensions. Weights sum to 1.0.
+
+### Dimension 1: Completeness (weight 0.30)
+
+**What it measures:** Whether the resume contains the sections and data points a reader needs to evaluate the candidate.
+
+**Scoring criteria:**
+
+- **90–100**: All standard sections present (summary optional, experience, education, skills). Every role has company, title, dates, and 3+ bullets. No missing dates, no gaps greater than 3 months unexplained.
+- **75–89**: All standard sections present. Most roles have full detail. Minor gaps: one role with only 1–2 bullets, or missing dates on one entry.
+- **60–74**: Core sections present but notably thin. Multiple roles with sparse detail (1–2 bullets), or one major section (skills, education) barely populated.
+- **40–59**: One major section missing or badly incomplete. For example, experience listed with no descriptions, or education missing entirely for a non-senior candidate.
+- **Below 40**: Multiple major sections missing. The resume could not support a hiring decision as-is.
+
+**Evidence to cite:** Count the roles. Count the bullets per role. Note any missing sections. Quote the specific thinness.
+
+### Dimension 2: Content quality (weight 0.50)
+
+**What it measures:** Whether the bullets are strong — active voice, specific verbs, quantified outcomes.
+
+**Scoring criteria:**
+
+- **90–100**: 80%+ of bullets have a strong verb, a specific action, and a measurable outcome. Numbers appear throughout. No hedge words ("helped", "responsible for", "worked on"). Seniority framing matches the candidate's level.
+- **75–89**: 60–80% of bullets meet the strong-bullet bar. A few bullets lack metrics or have weak verbs but the majority are strong. Overall framing is solid.
+- **60–74**: 40–60% of bullets are strong. Recognizable effort but inconsistent. Several bullets are activity-focused rather than outcome-focused. Some metrics missing where they should be present.
+- **40–59**: Fewer than 40% of bullets are strong. Dominant failure modes: passive voice, hedge words, activity-without-outcome, vague adjective-driven claims ("highly motivated," "results-driven"). Few metrics.
+- **Below 40**: The resume reads as a list of job descriptions rather than accomplishments. No ownership language, no specific outcomes, adjective soup.
+
+**Evidence to cite:** Quote 2-3 of the weakest bullets. Note the pattern (e.g., "4 of 12 bullets start with 'responsible for'"). Calculate the rough percentage of bullets with metrics.
+
+### Dimension 3: Skills currency (weight 0.20)
+
+**What it measures:** Whether the skills and technologies listed are current for the candidate's field and target role, or whether the profile reads as dated.
+
+**Scoring criteria:**
+
+- **90–100**: Skills are current, relevant to the target role, and appropriately curated (not everything-kitchen-sink). No obviously dated entries.
+- **75–89**: Skills are mostly current. Maybe 1–2 dated items (a legacy framework rarely used) but they don't dominate.
+- **60–74**: Skills list is a mix of current and dated. Some important modern skills missing for the target role.
+- **40–59**: Skills list reads as 5+ years behind current practice, OR is missing core skills that the target role would require.
+- **Below 40**: Skills list signals the candidate has been away from the field or is targeting the wrong level.
+
+**Evidence to cite:** Name specific skills that feel current vs. dated. If the target role is known, cite skills the posting likely wants that are missing.
+
+**Note on currency:** "Dated" is field-specific. Java is not dated for backend roles; jQuery is for frontend. Use the candidate's target role as the reference.
+
+### Computing the overall resume score
+
+```
+overall = (completeness * 0.30) + (content_quality * 0.50) + (skills_currency * 0.20)
+```
+
+Round to integer.
+
+---
+
+## LinkedIn rubric
+
+Five dimensions. Weights sum to 1.0.
+
+### Dimension 1: Headline optimization (weight 0.25)
+
+**What it measures:** Whether the LinkedIn headline is specific, positioning-rich, and keyword-aware within the 220-character limit.
+
+**Scoring criteria:**
+
+- **90–100**: Headline states role, signals specialization, includes 1–2 relevant keywords, and has a distinct voice. Uses character budget well (typically 90–180 chars). Clean separators.
+- **75–89**: Headline is clear and includes role + some specialization. Missing one element (keywords, specialty, or voice) or underuses the character budget.
+- **60–74**: Headline is functional but generic. Role is clear but positioning is weak. Could apply to hundreds of other people at the same level.
+- **40–59**: Generic or keyword-stuffed. "Senior Software Engineer | Full Stack | AI | Cloud | ML" style. Or so vague it says nothing ("Passionate technology professional").
+- **Below 40**: Missing, defaulted to job title only, or actively counter-productive ("Open to opportunities").
+
+**Evidence to cite:** The headline itself (quoted), with character count.
+
+### Dimension 2: About hook strength (weight 0.25)
+
+**What it measures:** Whether the first ~210 characters of the About section would make a reader click "see more."
+
+**Scoring criteria:**
+
+- **90–100**: First 210 chars create curiosity, state a specific point of view, or deliver a memorable credential. No wasted space on generic adjectives.
+- **75–89**: Opening is specific and substantive, though not maximally compelling. A reader would likely click "see more."
+- **60–74**: Opening is competent but generic. States credentials in a standard way. A reader might click "see more" out of diligence, not interest.
+- **40–59**: Opening is wasted on adjectives or generic framing ("I am a passionate professional with over X years of experience"). The see-more preview leaves nothing memorable.
+- **Below 40**: About section is empty, defaulted to third-person bio voice, or opens with pure adjective soup.
+
+**Evidence to cite:** Quote the first 210 characters exactly.
+
+### Dimension 3: Experience voice (weight 0.20)
+
+**What it measures:** Whether experience descriptions are written in LinkedIn-native voice (first person, short paragraphs) rather than resume-bullet-paste style.
+
+**Scoring criteria:**
+
+- **90–100**: All experience descriptions in first person, short paragraphs, LinkedIn-native voice. Current role has more detail than past roles.
+- **75–89**: Most roles in LinkedIn-native voice with 1–2 roles still in resume-bullet format. Or: good voice throughout but unbalanced depth (past roles as detailed as current).
+- **60–74**: Mixed. Some roles with LinkedIn-native descriptions, others pasted resume bullets, others empty.
+- **40–59**: Most roles are either empty or contain pasted resume bullets verbatim.
+- **Below 40**: Experience section is empty, or uses third-person bio voice throughout.
+
+**Evidence to cite:** Note how many roles have which treatment. Quote an example of the dominant pattern.
+
+### Dimension 4: Skills curation (weight 0.15)
+
+**What it measures:** Whether the skills section is deliberately curated for target-role discoverability.
+
+**Scoring criteria:**
+
+- **90–100**: 5–15 skills, top 3 intentionally chosen, all aligned to target role, strong endorsement density.
+- **75–89**: Reasonable curation. May have slightly too many (16–25) or top-3 ordering not optimal.
+- **60–74**: Acceptable but uncurated. Skill count reasonable but reads as a random dump.
+- **40–59**: Too many skills (25+), clearly uncurated, top-3 are defaults rather than choices.
+- **Below 40**: Skills section empty, or nearly so (< 3 skills listed).
+
+**Evidence to cite:** Count. Note the top 3. Flag if they look defaulted.
+
+### Dimension 5: Completeness (weight 0.15)
+
+**What it measures:** Whether the LinkedIn profile has all the structural fields populated that recruiters filter on.
+
+**Scoring criteria:**
+
+- **90–100**: Profile photo, banner, headline, About, current role with dates, education, skills, 3+ experience entries with descriptions. Location set. Open-to-work settings configured if applicable.
+- **75–89**: Most core fields populated. 1–2 structural fields missing (banner, for example).
+- **60–74**: Several structural fields empty. Experience entries missing descriptions. No banner.
+- **40–59**: Core profile exists but major fields missing (no About, no experience descriptions, no skills).
+- **Below 40**: Profile is barely populated. Would not pass a recruiter's basic filters.
+
+**Evidence to cite:** Name the specific missing fields.
+
+### Computing the overall LinkedIn score
+
+```
+overall = (headline * 0.25) + (about_hook * 0.25) + (experience_voice * 0.20)
+        + (skills_curation * 0.15) + (completeness * 0.15)
+```
+
+Round to integer.
+
+---
+
+## Recommendations
+
+After scoring, produce 3–5 ranked recommendations. **Always follow these rules:**
+
+1. **Rank by expected impact, not by dimension order.** If the About hook is a 45 and completeness is a 70, the About hook recommendation ranks higher even though completeness was scored first.
+
+2. **Specific, not generic.** Reject any recommendation that would apply to any profile ("Add more metrics to your bullets"). Require specificity: "The bullet in your Stripe role — 'Led migration to microservices' — has no metric. Add the scope (team size, services migrated) and outcome (latency, cost, deploy time)."
+
+3. **Actionable in one sitting.** Each recommendation should be completable in 30 minutes or less. "Rewrite your entire About section" is not one sitting; "Rewrite the first 210 characters of your About section to create a hook" is.
+
+4. **Tied to evidence from the profile.** Every recommendation cites the specific weak content it addresses.
+
+5. **Prioritize recommendations the user hasn't seen before.** If score history exists and a recommendation was surfaced last run and is still valid, lower its priority — it's either been dismissed intentionally or isn't resonating.
+
+### Recommendation quality check
+
+Before finalizing recommendations, apply this test: **would a senior professional reading this recommendation find it obvious or non-obvious?** If it's obvious ("your resume should have metrics"), reject it and dig deeper. The value of this tool is in non-obvious recommendations.
+
+The Week 3 exit criterion for this tool is that 3 of 5 recommendations on a real user's profile are non-obvious. Scoring that doesn't produce non-obvious recommendations isn't pulling its weight.
+
+## Determinism
+
+These rubrics are the single source of truth for scoring. When scoring the same profile twice, follow these rules to minimize drift:
+
+1. **Compute each dimension independently.** Don't let the overall score influence dimension scores or vice versa.
+
+2. **Cite evidence in the output.** If the same bullet drives the same evidence, the same score should result.
+
+3. **Round to integers only at the final step.** Dimension sub-scores and the weighted overall calculation should preserve precision until the end.
+
+4. **Use the bands as anchors.** If uncertain between a 68 and a 72, decide which band ("developing" vs. "solid") applies and pick the midpoint, not a boundary value.
+
+The eval harness tests this: the same profile run through scoring twice should produce overall scores within ±5 of each other. If they don't, the rubric has too much interpretive room and this skill needs tightening.

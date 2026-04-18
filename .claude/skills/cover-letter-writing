@@ -1,0 +1,151 @@
+---
+name: cover-letter-writing
+description: Write a cover letter tailored to a specific job posting, the user's profile, and a specified tone (direct, warm, or formal). Use this skill whenever the user asks for a cover letter, application letter, or "letter to go with my application", or asks to draft correspondence to a specific company about a specific role. The skill covers structural conventions, tone-specific voice guidance with worked examples, and the anti-patterns that make cover letters feel generic or AI-generated. Use especially when the user mentions a specific job posting or company they're applying to.
+---
+
+# Cover Letter Writing
+
+Most cover letters are bad, and most bad cover letters fail in the same way: they read like they could have been sent to any company for any role. The entire value of a cover letter is in the parts that *couldn't* be sent elsewhere.
+
+This skill captures the structural and tonal rules that separate cover letters that get read from cover letters that get skipped.
+
+## Structure
+
+A good cover letter is 3–4 short paragraphs, typically 250–400 words total. Longer is almost always worse.
+
+| Paragraph | Purpose | Length |
+|---|---|---|
+| Opening | Why this company, why this role, why now | 2–3 sentences |
+| Body 1 | Specific relevant experience with outcome | 3–5 sentences |
+| Body 2 (optional) | Second relevant angle or addressing a likely question | 3–4 sentences |
+| Closing | Next step and signoff | 1–2 sentences |
+
+**No salutation beyond "Dear [Hiring Manager]" or "Hi [Name] —" if the name is known.** "To Whom It May Concern" is dead; don't use it.
+
+## The opening paragraph
+
+The opening has one job: signal that this letter is for this company and role, not a template.
+
+### Patterns that work
+
+- **Specific reference to the company's work**: "I've been following Plaid's pivot into identity verification since the Cognito acquisition, and the problem you're tackling with Plaid Check is exactly the kind of infrastructure work I want to be doing next."
+- **Specific connection to the role**: "The Staff Engineer role on your Data Platform team caught my attention because of the challenge you called out in the posting — scaling from 10TB to 10PB is the exact transition I ran at Square between 2020 and 2023."
+- **A person who sent them**: "Your teammate Priya Ramesh suggested I reach out about the Senior PM role. She and I worked together on the notifications team at Twilio."
+
+### Openings to reject
+
+- `I am writing to express my strong interest in the [role] position at [company].` (generic, every cover letter opens this way)
+- `As a passionate and results-driven professional, I believe I would be a great fit for your team.` (zero information, template language)
+- `Please accept my application for the position of...` (formal in a way that signals distance, not respect)
+
+## The body paragraphs
+
+The body is where specific relevance gets demonstrated. One or two paragraphs, each making a different argument for fit.
+
+### Rules
+
+1. **One concrete example per paragraph.** Not a list of accomplishments; a single story.
+2. **Include numbers.** Same rule as resumes: specificity signals credibility.
+3. **Connect to the company's stated needs.** If the posting emphasizes something, address it directly.
+4. **Don't repeat the resume.** The cover letter exists because the resume doesn't have room for narrative. Use that room.
+
+### Anti-patterns
+
+- Listing 5 bullet-point accomplishments in paragraph form (this is just a worse version of the resume)
+- Explaining why the user wants the job without explaining why the company should want them
+- Addressing weaknesses ("I don't have direct experience with X, but...") — this plants doubt that might not have been there
+
+## The closing
+
+Short. Signal openness to conversation and sign off. That's it.
+
+**Good:**
+```
+I'd love to talk more about how my experience at Stripe maps to what
+you're building at Plaid. I'm available for a call any afternoon next week.
+
+Best,
+Jordan
+```
+
+**Bad:**
+```
+Thank you for taking the time to consider my application. I look forward
+to the opportunity to discuss how my skills and experience can contribute
+to the continued success of [Company]. Please do not hesitate to contact
+me at your earliest convenience.
+```
+
+The bad version says nothing specific, uses more words to say it, and signals deference rather than confidence.
+
+## Tone
+
+The user specifies one of three tones. Each has distinct voice characteristics.
+
+### Direct
+
+Best for: engineering roles, senior IC positions, roles at companies with a direct/plainspoken culture (Stripe, Amazon, many startups).
+
+Characteristics: short sentences, contractions, plain language, no hedging, confidence in the user's fit.
+
+**Direct opening example:**
+> The Staff Engineer role on your Search team is the job I'd write for myself. I've spent the last four years building search at scale — specifically the migration from Elasticsearch to a custom ranking stack at Gusto, which cut p95 latency by 60%. What you're describing in the posting is the next version of that problem.
+
+### Warm
+
+Best for: people-facing roles, roles at mission-driven companies, situations where the user has a personal connection to the company's work.
+
+Characteristics: slightly more formal sentence structure, occasional emotion, reference to the "why" of the company's work, first-person vulnerability is allowed in small doses.
+
+**Warm opening example:**
+> I've been a Superhuman user for three years, and the thing I keep coming back to is how much care is visible in the product — every interaction feels like someone thought about it twice. That's the bar I try to hold for my own work in product design, and it's why the Senior Designer role caught my attention immediately.
+
+### Formal
+
+Best for: traditional industries (law, finance, academia, government), executive-level roles, companies where informality reads as unserious.
+
+Characteristics: full sentences, no contractions, measured tone, credentials framed respectfully, slightly elevated vocabulary without being stiff.
+
+**Formal opening example:**
+> I am writing to apply for the Director of Product role at Vanguard. My twelve years in asset management product development — most recently as Senior Product Manager at Fidelity's ETF division — have prepared me well for the scope and regulatory complexity of the position you have described.
+
+## The "generic AI letter" trap
+
+The single biggest failure mode of AI-generated cover letters is that they read like AI-generated cover letters. Recruiters and hiring managers are now highly attuned to this. Signals that give it away:
+
+- **Over-use of "passion" and "excited"** — real people don't use these words that often
+- **Triadic lists** ("my experience, skills, and dedication") — AI loves these; humans use them less
+- **Perfect balance** — a cover letter that gives equal weight to every qualification reads as mechanical
+- **Company-name sprinkling** — mentioning the company name four times doesn't signal research, it signals a template with slots
+- **Overly symmetric paragraph lengths**
+
+### How to avoid the trap
+
+1. **Have one unifying angle, not a balanced coverage.** A good cover letter argues one thing.
+2. **Include a specific detail that couldn't have been generated without research** — a reference to something the company has shipped, said, or hired for recently.
+3. **Vary sentence length deliberately.** Short sentence after long sentence. Creates rhythm.
+4. **Remove at least one "passionate" and one "excited"** before finalizing.
+
+## When the user provides company context
+
+If the user has opted into the company-context web search, incorporate 1–2 specific details from the search naturally. Things to look for:
+
+- Recent product launches
+- Recent funding rounds (if relevant — "congratulations on the Series C" can feel earnest or sycophantic; use judgment)
+- Recent public statements from leadership relevant to the role
+- Shifts in company focus or strategy
+
+**Don't** include details that aren't actually relevant to the role — referencing recent news for its own sake reads worse than not mentioning it.
+
+## Before delivering output
+
+1. Word count: 250–400. Tighter is better. If over 400, cut.
+2. Company name appears 1–3 times, naturally.
+3. Role title appears 1–2 times.
+4. At least one specific detail that required actual thought about this company and role.
+5. Opening does not start with "I am writing to..." or any equivalent template phrase.
+6. Closing is short and confident, not deferential.
+7. Tone matches the specified tone throughout.
+8. No more than one "passionate", "excited", or "thrilled" in the whole letter.
+
+Present the cover letter with the word count visible (e.g., "Cover letter (328 words, direct tone)") so the user can verify at a glance.
