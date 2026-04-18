@@ -1,0 +1,201 @@
+---
+name: linkedin-content
+description: Write or rewrite LinkedIn profile content — specifically the headline, the About section, and experience descriptions — following the conventions that actually work on the platform. Use this skill whenever the user asks for help with LinkedIn writing of any kind, including requests framed as "polish my profile", "make this sound better for LinkedIn", "fix my headline", "rewrite my About", "update my experience section", or any adjacent ask. Also use it when rewriting resume content that's explicitly being targeted at a LinkedIn audience, since LinkedIn conventions differ substantially from resume conventions.
+---
+
+# LinkedIn Content
+
+LinkedIn content follows rules that are genuinely different from resumes, personal websites, or generic professional writing. A bullet point that sings on a resume reads as robotic and cold on LinkedIn. A sentence that works in a cover letter gets truncated at the wrong place by LinkedIn's "see more" cutoff. This skill captures the conventions that separate content that gets read from content that gets scrolled past.
+
+## The three surfaces
+
+LinkedIn has three distinct writing surfaces. Each has its own rules.
+
+| Surface | Character limit | Voice | Structure |
+|---|---|---|---|
+| Headline | 220 chars | Present tense, professional | One line, no periods at end |
+| About | 2,600 chars | First person, conversational | Paragraphs, hook in first ~210 chars |
+| Experience description | 2,000 chars per role | First person, active | Short paragraphs, not bullets |
+
+Treat the limits as hard. LinkedIn silently truncates anything over the limit. Always count characters and state the count when delivering output.
+
+## Headline (220 chars)
+
+The headline is the single most-seen piece of content on the profile. It appears next to the user's name in every search result, every comment, every post impression. A weak headline torpedoes everything else.
+
+**A good headline does three things:**
+
+1. States the role or professional identity clearly (what you do)
+2. Signals specialization or positioning (what makes you distinct)
+3. Includes 1–2 keywords a recruiter would search for
+
+**Three patterns that reliably work:**
+
+- **Role + Focus + Signal**: `Staff Engineer at Stripe · Building developer platforms · ex-AWS, ex-Square`
+- **Positioning statement**: `Helping Series A startups scale their infra from 10 to 100 engineers`
+- **Role + Specialty + Proof**: `Engineering Director · Fintech infrastructure · Led teams of 40+ through 3 acquisitions`
+
+**Anti-patterns to reject:**
+
+- `Passionate about technology and making a difference` (vague, everyone says this)
+- `Senior Software Engineer | Full Stack | Cloud | AI | ML | Blockchain` (keyword stuffing, reads as insecure)
+- `Dad. Husband. Coffee enthusiast. Occasional software engineer.` (cute on Twitter, unprofessional on LinkedIn)
+- Anything ending with a period — LinkedIn's visual rhythm reads better without terminal punctuation
+
+**Separators:** Use `·` (middle dot) or `|` consistently. The middle dot reads as more premium. Pick one and stick with it.
+
+**When rewriting a headline**, produce 2–3 variants with different positioning angles. Let the user pick. Don't commit to one interpretation of their career without evidence.
+
+## About section (2,600 chars)
+
+The About section is where most LinkedIn profiles fail hardest. Either it's empty, or it's the person's resume pasted in, or it's a third-person bio that belongs on a company website.
+
+**The cardinal rule: write in first person, conversationally, with paragraph breaks.**
+
+### The "see more" cutoff
+
+On desktop, LinkedIn truncates the About section at approximately 210 characters with a "…see more" link. On mobile, closer to 170. This is the most important thing about the About section: **your first ~210 characters must make someone click "see more."**
+
+Do NOT front-load with credentials ("I am a Stanford graduate with 15 years of experience…"). Recruiters already saw the headline. Use the cutoff zone for a hook that creates curiosity or signals unusual value.
+
+**Hook patterns that work:**
+
+- **The surprising identity**: `I'm an engineer who thinks like a product manager, which means I ask "why" before I ask "how."`
+- **The problem you solve**: `Most engineering orgs break at the 50-person mark. I spend my days helping the ones that don't want to.`
+- **The contrarian take**: `The hardest part of building fintech isn't the regulations — it's the boredom. Here's what I mean.`
+- **The concrete credential**: `Over the last decade I've shipped infrastructure that has moved more than $400B in payments.`
+
+### Structure for the full About
+
+Three to five paragraphs, each 2–4 sentences. Don't write walls of text.
+
+1. **Hook** (fits in the see-more preview)
+2. **Credibility paragraph** — specific outcomes, companies, scope, numbers
+3. **What you care about / what you're known for** — the thing that makes you distinct
+4. **What you're currently focused on** — signals what you want more of
+5. **A concrete call to action** — "I'm open to chatting about X. Best reached at Y." (optional but recommended for open-to-work users)
+
+### Voice
+
+- First person. `I` and `my`, not `he` or `Sarah`.
+- Active, not passive. "I led" not "Teams were led by me."
+- Specific, not vague. "Cut deploy time from 45 min to 4" not "Improved deployment efficiency."
+- Human. Contractions are fine. Humor is fine in small doses. Don't sound like a press release.
+
+### Anti-patterns to reject
+
+- Third-person bio voice ("Sarah is a passionate…") — this is the #1 most common failure mode
+- Resume-bullet style in paragraph form ("Responsible for leading teams, delivering solutions…")
+- Adjective-driven self-praise ("Highly motivated, results-oriented, dynamic professional…")
+- Vague closers ("Always looking to connect with like-minded professionals")
+- Massive walls of text with no paragraph breaks
+
+## Experience descriptions (2,000 chars per role)
+
+This is where users most often just paste their resume bullets. That's the wrong instinct. Resume bullets read as cold and machine-like in LinkedIn's layout.
+
+**Rewrite resume bullets into short first-person paragraphs.**
+
+**Resume bullet version:**
+```
+• Led migration of payment processing platform to microservices architecture,
+  reducing latency by 40% and cutting infrastructure costs by $2.3M annually
+```
+
+**LinkedIn experience version:**
+```
+I led the migration of our payment processing platform from a monolith to
+microservices — a two-year project involving 12 engineers across three teams.
+The headline result: 40% lower latency and $2.3M saved on infrastructure annually.
+The quieter result I'm prouder of: the team grew from 4 to 12 during the project
+without missing a single quarterly milestone.
+```
+
+### Rules for experience descriptions
+
+- First person. Same as About.
+- 2–4 short paragraphs per role, not a bulleted list
+- Include the outcome (numbers if you have them) but also the story (what it was like, what you learned, what you're proud of)
+- Higher-seniority roles get more narrative; early-career roles can be tighter and more bullet-adjacent
+- The current role gets more detail than past roles — reverse-pyramid the effort
+
+### When the user provides their resume bullets
+
+Do not copy them verbatim. Extract the facts (what they did, the outcomes, the scope) and rewrite into LinkedIn-native prose. Always preserve specific numbers and company names; rewrite the framing.
+
+## Skills section (not free text, but worth noting)
+
+LinkedIn's skills section is a structured list, not prose. A few rules worth knowing since the user may ask for guidance:
+
+- Top 3 skills are weighted most heavily by LinkedIn's search algorithm. Choose deliberately.
+- 5–15 skills is the sweet spot. More than 20 looks undiscriminating.
+- Skills should reflect what you want to be found for, not everything you've ever touched
+- Prioritize skills that have endorsements from people with those same skills
+
+## Keyword optimization
+
+LinkedIn is a search engine. Recruiters search by title, skills, and location. A profile that doesn't contain the keywords recruiters search for will never surface.
+
+When rewriting, ask the user (or infer from their target role) which keywords should appear. Good placement:
+
+- Headline: 1–2 keywords
+- About: keywords appear naturally in context, 3–5 instances across the whole section
+- Experience descriptions: keywords appear where relevant, not forced
+
+Do not stuff keywords. LinkedIn's algorithm is smart enough to detect obvious stuffing, and human readers always are. The right density is "these words appear because I genuinely do this work," not "these words appear because I want to rank."
+
+## Before delivering output
+
+Before handing any LinkedIn content to the user, run this checklist mentally:
+
+1. **Character count**: Under the limit for the surface? State the count explicitly.
+2. **Voice**: First person throughout? No third-person slippage?
+3. **Hook** (for About only): Does the first ~210 characters make someone want to click "see more"? If not, rewrite the opening.
+4. **Concreteness**: Are there specific numbers, companies, or outcomes? If the content is all adjectives, it's too vague.
+5. **Keywords** (if specified): Do the right keywords appear naturally?
+6. **Voice match**: Does this sound like the user, based on the voice in their existing content? A major voice shift between what they have and what you wrote will feel uncanny to them.
+
+Always present LinkedIn output with a visible character count (e.g., "Headline (198/220 chars)") so the user can verify at a glance.
+
+## Examples
+
+### Example 1: Headline rewrite
+
+**Input context:** User is a Senior Product Manager at a B2B SaaS company, 8 years of experience, focus on enterprise customers and API products.
+
+**Weak original:** `Senior Product Manager | B2B SaaS | Enterprise | APIs | AI | Product-Led Growth`
+
+**Better variants to offer:**
+
+- `Senior PM building API products for enterprise B2B · Shipped APIs used by Fortune 500 customers` (105/220)
+- `Product at [Company] · Enterprise APIs and developer experience · Previously at [Previous]` (97/220)
+- `I build API products that enterprise developers actually want to use. Currently PM at [Company].` (102/220)
+
+### Example 2: About section hook rewrite
+
+**Weak original first line:** `I am a passionate and results-driven product manager with over 8 years of experience in the B2B SaaS industry.`
+
+**Problem:** The first 210 characters are wasted on adjectives and a keyword list. Nobody clicks "see more" after reading this.
+
+**Better hook:** `The best API feedback I ever got was from a customer who said: "Your docs are boring, but they're right." That's the product work I care about — the kind nobody compliments but everybody relies on.`
+
+This fits in the see-more preview, creates curiosity, signals a specific point of view, and is memorable. The rest of the About section can then deliver credentials.
+
+### Example 3: Experience description rewrite
+
+**User's resume bullet:**
+```
+• Launched enterprise tier product, generating $8M ARR in year one and
+  establishing company's first six-figure contracts
+```
+
+**Rewritten for LinkedIn:**
+```
+My biggest project here was launching our enterprise tier — the company's first
+move upmarket. I owned the product strategy, pricing model, and go-to-market
+partnership with sales.
+
+Year one: $8M ARR, our first six-figure contracts, and a clear signal that the
+upmarket motion works. Year two I'm focused on the follow-on: turning those
+first enterprise customers into expansion revenue.
+```
