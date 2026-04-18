@@ -1,0 +1,227 @@
+---
+name: resume-writing
+description: Write or rewrite resume content — specifically bullet points, role descriptions, and summaries — using modern conventions that survive recruiter skims, ATS systems, and hiring manager scrutiny. Use this skill whenever the user asks for help with resume writing, including requests like "strengthen this bullet", "make this more impactful", "rewrite my resume", "fix my experience section", "help me quantify this", or any adjacent ask. Also use when writing content that will end up on a resume even if the user hasn't used the word "resume" explicitly — for example, when drafting role descriptions for a new job they're adding. Do NOT use this skill for LinkedIn content; LinkedIn conventions are different and are covered by the linkedin-content skill.
+---
+
+# Resume Writing
+
+Resumes are a constrained medium. A recruiter spends 6–8 seconds on the first pass. The document gets parsed by ATS (applicant tracking system) software that strips most formatting. Every bullet competes for attention with every other bullet. This skill captures what separates bullets that land from bullets that blend in.
+
+## The fundamental unit: the bullet
+
+Resumes are read bullet-by-bullet. Get the bullet right and everything else follows.
+
+### The XYZ formula
+
+Most strong resume bullets follow a variant of this structure:
+
+> **Accomplished [X] as measured by [Y], by doing [Z].**
+
+Or, in the order that actually reads best on a resume:
+
+> **[Action verb] + [what you did, specifically] + [measurable outcome]**
+
+**Examples:**
+
+- `Redesigned the checkout flow, increasing conversion by 18% and reducing cart abandonment by 24%`
+- `Led migration from monolith to microservices for 12-engineer team, cutting deploy time from 45 min to 4`
+- `Owned P&L for $40M product line; grew revenue 34% year-over-year across 3 consecutive years`
+
+The pattern: **strong verb → concrete action → measurable result.** When one of the three is missing, the bullet is weaker.
+
+### Action verbs: specific beats generic
+
+Weak verbs: `worked on`, `helped`, `was responsible for`, `assisted`, `supported`, `involved in`, `participated in`.
+
+These are hedge words. They signal the writer is unsure how much credit they can claim. Replace with verbs that claim clear ownership.
+
+Strong verb categories:
+
+| Category | Examples |
+|---|---|
+| Leadership | Led, drove, orchestrated, directed, mentored, managed |
+| Building | Built, designed, architected, engineered, developed, implemented |
+| Improving | Reduced, increased, accelerated, streamlined, optimized, doubled |
+| Owning | Owned, spearheaded, launched, shipped, delivered |
+| Analyzing | Analyzed, quantified, identified, diagnosed, investigated |
+| Influencing | Convinced, negotiated, partnered, aligned, advocated |
+
+**Start every bullet with a verb.** Not "Was responsible for leading…" but "Led…". Not "Helped build…" but "Built…" (assuming they really did the work).
+
+### Metrics: specificity signals credibility
+
+Numbers do three things: they anchor the claim in reality, they compress information, and they signal the writer thinks like an operator.
+
+**Every bullet should contain at least one number, unless it genuinely cannot.** Good numbers:
+
+- Percentages (conversion, reduction, growth)
+- Dollar amounts (revenue, cost savings, budget)
+- Scale (team size, user count, transaction volume)
+- Time (cycle time, deploy time, turnaround time)
+- Counts (features shipped, contracts closed, incidents resolved)
+
+**When the user can't remember exact numbers**, help them estimate defensibly. "About 40%" is better than no number. "~$2M" is better than "significant savings." Encourage round numbers with a tilde over false precision.
+
+**When a number doesn't exist and can't be estimated**, the bullet can still work if the action itself is high-signal. "Wrote the RFC that shaped the company's authentication strategy" has no number but carries weight because of the artifact.
+
+### Anti-patterns to reject
+
+- `Responsible for managing team of engineers` (no outcome, no scope, weak verb)
+- `Helped with launch of new product` (hedge word, vague)
+- `Played a key role in driving strategic initiatives` (jargon-stuffed, zero content)
+- `Worked closely with cross-functional stakeholders` (says nothing specific)
+- `Utilized leadership skills to deliver results` (MBA-speak with no information)
+
+## Seniority-appropriate framing
+
+A senior engineer's resume looks different from a Director's, which looks different from a VP's. Match the framing to the level.
+
+### Individual contributor (up to Staff)
+
+- Emphasis on craft, technical depth, and direct contributions
+- Bullets describe specific systems built, problems solved, features shipped
+- Metrics: technical (latency, throughput, uptime, deploy frequency) or product (users, conversion, revenue attributed)
+- Scope claims stay honest — "contributed to" is appropriate when the work was collaborative
+
+### First-line manager (Manager, Senior Manager)
+
+- Emphasis on team outcomes AND continued technical contribution
+- Bullets balance "what the team shipped" with "what I did as a leader"
+- Metrics: team size, retention, hiring pace, delivery velocity, product outcomes
+- Start introducing leadership-specific verbs: mentored, coached, hired, developed
+
+### Senior leader (Director, Senior Director, VP)
+
+- Emphasis on organizational impact, strategy, and business outcomes
+- Bullets describe orgs led, strategies set, cross-functional initiatives driven
+- Metrics: org size (reports, indirect reports), budget/P&L, business outcomes (revenue, cost, retention), strategic wins (market entry, M&A)
+- Technical details recede; business context dominates
+- Common mistake at this level: writing like a senior IC. A VP's resume that talks about "architected the authentication service" is signaling the wrong level.
+
+### Executive (SVP, C-suite)
+
+- Emphasis on company-level outcomes and strategic leadership
+- Bullets describe companies shaped, boards reported to, major strategic decisions
+- Metrics: revenue scale, headcount scale, fundraising, M&A, market outcomes
+- Narrative matters more than bullet count; consider a 2–3 sentence role summary followed by 3–5 high-impact bullets
+
+## ATS optimization
+
+Most resumes get parsed by ATS software before a human sees them. This imposes constraints.
+
+### Format rules for ATS survival
+
+- Use a single-column layout. Multi-column resumes break ATS parsing.
+- Standard section headers: `Experience`, `Education`, `Skills`, `Certifications`. Don't get cute ("Professional Journey" confuses ATS).
+- No tables, no text boxes, no graphics, no icons
+- Standard fonts only (Arial, Calibri, Helvetica, Georgia, Times)
+- Save as PDF (not image, not unusual format). Some ATS prefer .docx; check the application.
+- No text in headers/footers (many ATS skip these)
+
+### Keyword optimization for ATS
+
+ATS software scores resumes against the job description. Keywords matter, but not in a stuffing sense.
+
+- Include the job title verbatim if the user has held it ("Senior Software Engineer," not "Sr. SWE")
+- Include skills the job requires, using the exact phrasing from the posting when possible ("TypeScript" not "TS"; "Kubernetes" not "K8s")
+- Include acronyms AND spelled-out versions for common ones: "Search Engine Optimization (SEO)"
+- Don't stuff. ATS algorithms have improved; obvious keyword stuffing can now be detected and penalized.
+
+When rewriting for a specific job, ask the user for the job description and incorporate its exact language where it genuinely applies to their experience.
+
+## Summary / objective sections
+
+Most resumes don't need a summary. For senior candidates (10+ years) or career-change candidates, a summary is worth including.
+
+### A good summary is 2–4 lines
+
+- Who you are professionally (title, years of experience, domain)
+- What you're known for (the thing that makes you distinct)
+- What you're looking for (optional, targeted to the role)
+
+**Example:**
+```
+Engineering leader with 15 years building infrastructure at scale. Led
+platform teams at Stripe and Square, specializing in payments systems
+and multi-region architecture. Currently seeking VP Engineering roles
+at Series B–C companies building financial infrastructure.
+```
+
+**Anti-pattern (the classic bad summary):**
+```
+Highly motivated and results-driven professional with a passion for
+technology and a proven track record of success in dynamic, fast-paced
+environments.
+```
+
+The anti-pattern contains zero information. Every adjective could describe any professional in any field. Reject these and rewrite.
+
+## Education, certifications, and skills
+
+Quick rules since these matter but don't need deep treatment:
+
+- **Education**: School, degree, major, graduation year. Only include GPA if above 3.7 and you graduated within the last 5 years. Drop the year once you're 15+ years out (mild age-discrimination hedge).
+- **Certifications**: Include only if relevant. AWS/GCP/Azure certs matter for infra roles. PMP matters for PM roles. Half the certs on most resumes don't need to be there.
+- **Skills**: Organized by category (Languages, Frameworks, Tools, Platforms). Don't list everything you've ever touched. List what you actually want to be hired for.
+
+## Before delivering output
+
+Run this checklist before handing resume content to the user:
+
+1. **Strong verb**: Does every bullet start with an active verb?
+2. **Metric**: Does every bullet have a number, or a clear defense for why one can't be there?
+3. **Outcome**: Does every bullet end with a result, not just an activity?
+4. **Specificity**: Are adjectives carrying weight, or could you delete them without losing meaning? If so, delete them.
+5. **Level match**: Does the framing match the seniority the user is targeting?
+6. **No jargon-stuffing**: Does each bullet say something specific that someone outside the user's role could understand?
+
+When presenting rewritten bullets, show both the original and the rewrite so the user can compare. Keep the rewrite at a similar length to the original — dramatic length changes are hard to slot into the existing resume layout.
+
+## Examples
+
+### Example 1: Strengthening a weak bullet
+
+**Original:**
+```
+• Responsible for working on the deployment pipeline and improving build times
+```
+
+**Problems:** Weak verb ("responsible for working on"), no metric, no specific outcome.
+
+**Rewrite, asking the user for details:**
+```
+• Rewrote the CI/CD pipeline, cutting build times from 18 minutes to 4 and
+  reducing failed deploys by 60%
+```
+
+### Example 2: Adding missing metrics
+
+**Original:**
+```
+• Led product discovery for new customer onboarding flow
+```
+
+**Problem:** Good verb, but no outcome. The bullet describes activity, not impact.
+
+**Rewrite (after asking about outcomes):**
+```
+• Led product discovery for redesigned onboarding flow; launched redesign
+  drove 22% lift in activation and is now the company's default pattern
+  for all onboarding touchpoints
+```
+
+### Example 3: Fixing seniority mismatch
+
+**VP candidate's bullet:**
+```
+• Implemented authentication service using OAuth 2.0 and JWT tokens
+```
+
+**Problem:** This reads like a senior IC's bullet. At the VP level, the framing should be organizational.
+
+**Rewrite:**
+```
+• Directed the org's authentication platform strategy; shipped OAuth 2.0
+  migration across 40+ services with zero customer-facing downtime,
+  enabling enterprise SSO deals worth $12M in new ARR
+```
