@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
     obsidian_api_port: int = 27124
+    obsidian_api_key: str = ""
     database_url: str = "sqlite:///./career_command_center.db"
 
 
