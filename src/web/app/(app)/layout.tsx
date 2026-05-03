@@ -12,6 +12,7 @@ import {
   Network,
   Users,
   LogOut,
+  Target,
 } from "lucide-react";
 import { useProfile, useProfileActions } from "@/lib/hooks/use-profile";
 import { api } from "@/lib/api";
@@ -21,6 +22,7 @@ const NAV = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Today" },
   { href: "/feed", icon: Briefcase, label: "Job feed" },
   { href: "/pipeline", icon: KanbanSquare, label: "Pipeline" },
+  { href: "/analyze", icon: Target, label: "JD analyzer" },
   { href: "/resume", icon: FileText, label: "Resume" },
   { href: "/letters", icon: Mail, label: "Cover letters" },
   { href: "/linkedin", icon: Network, label: "LinkedIn" },
