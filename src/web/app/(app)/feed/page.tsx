@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -39,10 +39,11 @@ function scoreColor(s: number) {
   return "var(--red)";
 }
 
-function JobCard({ sj, onDismiss, onAddToPipeline }: {
+function JobCard({ sj, onDismiss, onAddToPipeline, onExplain }: {
   sj: SavedJob;
   onDismiss: (id: number) => void;
   onAddToPipeline: (sj: SavedJob) => void;
+  onExplain: (sj: SavedJob) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const { job } = sj;
@@ -164,6 +165,23 @@ function JobCard({ sj, onDismiss, onAddToPipeline }: {
               <ExternalLink size={13} />
             </a>
           )}
+          <button
+            onClick={() => onExplain(sj)}
+            style={{
+              padding: "6px 11px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid rgba(160,121,255,0.25)",
+              background: "var(--vault-soft)",
+              color: "var(--vault-purple)",
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              letterSpacing: "-0.01em",
+            }}
+            title="Why this job? — vault-backed analysis"
+          >
+            Why this?
+          </button>
           <button
             onClick={() => onAddToPipeline(sj)}
             style={{
@@ -419,6 +437,7 @@ export default function FeedPage() {
   const [keywords, setKeywords] = useState(defaults.keywords);
   const [location, setLocation] = useState(defaults.location);
   const [addTarget, setAddTarget] = useState<SavedJob | null>(null);
+  const [explainTarget, setExplainTarget] = useState<SavedJob | null>(null);
 
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ["jobs", profileId],
@@ -529,6 +548,7 @@ export default function FeedPage() {
               sj={sj}
               onDismiss={dismiss}
               onAddToPipeline={setAddTarget}
+              onExplain={setExplainTarget}
             />
           ))}
         </AnimatePresence>
@@ -543,7 +563,145 @@ export default function FeedPage() {
             onClose={() => setAddTarget(null)}
           />
         )}
+        {explainTarget && profileId && (
+          <ExplainModal
+            key="explain"
+            sj={explainTarget}
+            profileId={profileId}
+            onClose={() => setExplainTarget(null)}
+          />
+        )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/* ── "Why this job?" modal ── */
+function ExplainModal({ sj, profileId, onClose }: {
+  sj: SavedJob; profileId: number; onClose: () => void;
+}) {
+  const explain = useMutation({
+    mutationFn: () =>
+      api.fit.explain({
+        profile_id: profileId,
+        job_description: sj.job.description || "",
+        job_title: sj.job.title,
+        company: sj.job.company,
+      }),
+  });
+
+  // Auto-fire on open
+  useEffect(() => { explain.mutate(); /* eslint-disable-next-line */ }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.75)",
+        backdropFilter: "blur(6px)",
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ scale: 0.96, y: 12 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.96, y: 12 }}
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border-strong)",
+          borderRadius: "var(--radius-xl)",
+          padding: "24px 26px",
+          width: 560,
+          maxHeight: "80vh",
+          overflowY: "auto",
+          boxShadow: "var(--shadow-lg)",
+        }}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <span className="chrome">Why this job?</span>
+            <div style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.015em", marginTop: 4 }}>
+              {sj.job.title}
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)" }}>
+              {sj.job.company}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ color: "var(--text-muted)" }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {explain.isPending && (
+          <div style={{ padding: "32px 0", textAlign: "center", fontFamily: MONO, fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.04em" }}>
+            CONSULTING THE VAULT…
+          </div>
+        )}
+
+        {explain.data && (
+          <>
+            <pre
+              style={{
+                fontFamily: "inherit",
+                fontSize: "0.875rem",
+                color: "var(--text-secondary)",
+                lineHeight: 1.7,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                letterSpacing: "-0.005em",
+                margin: 0,
+                padding: "12px 14px",
+                background: "var(--surface-2)",
+                borderRadius: "var(--radius)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              {explain.data.output}
+            </pre>
+            {explain.data.evidence.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div className="chrome" style={{ marginBottom: 8 }}>
+                  Vault hits · {explain.data.evidence.length}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {explain.data.evidence.slice(0, 4).map((e, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: "10px 12px",
+                        borderRadius: "var(--radius-sm)",
+                        background: "var(--vault-soft)",
+                        border: "1px solid rgba(160,121,255,0.2)",
+                      }}
+                    >
+                      <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--vault-purple)", letterSpacing: "0.04em", marginBottom: 4 }}>
+                        {e.filename}
+                      </div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                        {e.context}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {explain.isError && (
+          <div style={{ padding: 16, color: "var(--red)", fontSize: "0.85rem" }}>
+            Couldn't generate explanation. Vault may be offline.
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
   );
 }
