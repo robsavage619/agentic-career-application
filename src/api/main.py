@@ -6,7 +6,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.db import init_db
-from api.routers import cover_letter, dashboard, jobs, linkedin, panel, pipeline, profiles, resume
+from api.routers import (
+    cover_letter,
+    dashboard,
+    fit,
+    jobs,
+    linkedin,
+    panel,
+    pipeline,
+    profiles,
+    resume,
+)
 
 
 @asynccontextmanager
@@ -33,6 +43,7 @@ app.include_router(cover_letter.router, prefix="/api/cover-letter", tags=["cover
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(linkedin.router, prefix="/api/linkedin", tags=["linkedin"])
 app.include_router(panel.router, prefix="/api/panel", tags=["panel"])
+app.include_router(fit.router, prefix="/api/fit", tags=["fit"])
 
 
 @app.get("/api/health")
