@@ -53,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
       {/* ── Sidebar ── */}
       <aside
-        className="w-[232px] shrink-0 flex flex-col"
+        className="w-[220px] shrink-0 flex flex-col"
         style={{
           background: "var(--sidebar-bg)",
           borderRight: "1px solid var(--border)",
@@ -61,36 +61,58 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         {/* Wordmark */}
         <div className="px-5 pt-6 pb-7">
-          <div className="flex items-center gap-2.5">
-            <div
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                background: "var(--accent)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--accent-text)",
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                boxShadow: "var(--shadow-xs)",
-              }}
-            >
-              C
-            </div>
+          <div className="flex flex-col gap-0.5">
             <span
               style={{
-                fontSize: "0.95rem",
+                fontFamily: "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace",
+                fontSize: "0.65rem",
                 fontWeight: 600,
-                letterSpacing: "-0.025em",
-                color: "var(--text-primary)",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                textShadow: "var(--accent-glow)",
+                lineHeight: 1,
               }}
             >
               Career
             </span>
+            <span
+              style={{
+                fontFamily: "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace",
+                fontSize: "0.65rem",
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                textShadow: "var(--accent-glow)",
+                lineHeight: 1,
+              }}
+            >
+              Command
+            </span>
+            <span
+              style={{
+                fontFamily: "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace",
+                fontSize: "0.65rem",
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                textShadow: "var(--accent-glow)",
+                lineHeight: 1,
+              }}
+            >
+              Center
+            </span>
           </div>
+          <div
+            className="mt-2"
+            style={{
+              width: "100%",
+              height: 1,
+              background: "linear-gradient(90deg, var(--accent-soft) 0%, transparent 100%)",
+            }}
+          />
         </div>
 
         {/* Nav */}
@@ -101,28 +123,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
-                className="group flex items-center gap-2.5 px-3 py-2 transition-colors duration-150 select-none"
+                className="group flex items-center gap-2.5 px-3 py-2 transition-all duration-150 select-none"
                 style={{
                   borderRadius: "var(--radius)",
-                  background: active ? "var(--surface)" : "transparent",
-                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                  boxShadow: active ? "var(--shadow-xs)" : "none",
+                  background: active ? "var(--surface-2)" : "transparent",
+                  color: active ? "var(--text-primary)" : "var(--text-tertiary)",
                   border: active ? "1px solid var(--border)" : "1px solid transparent",
                 }}
               >
                 <Icon
-                  size={16}
+                  size={15}
                   strokeWidth={active ? 2 : 1.75}
                   style={{
-                    color: active ? "var(--accent)" : "var(--text-tertiary)",
+                    color: active ? "var(--accent)" : "var(--text-muted)",
                     flexShrink: 0,
+                    filter: active ? "drop-shadow(0 0 4px rgba(122,255,142,0.4))" : "none",
                   }}
                 />
                 <span
-                  className="text-[0.875rem] truncate"
+                  className="text-[0.825rem] truncate"
                   style={{
-                    fontWeight: active ? 550 : 450,
+                    fontWeight: active ? 550 : 400,
                     letterSpacing: "-0.01em",
+                    color: active ? "var(--text-primary)" : "var(--text-tertiary)",
                   }}
                 >
                   {label}
@@ -134,53 +157,56 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Profile chip */}
         {profile && (
-          <div className="px-3 pb-3 mt-3">
+          <div className="px-3 pb-4 mt-3">
             <div
               className="flex items-center gap-2.5 px-3 py-2.5"
               style={{
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: "var(--radius)",
-                boxShadow: "var(--shadow-xs)",
               }}
             >
               <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center"
+                className="flex h-7 w-7 shrink-0 items-center justify-center"
                 style={{
                   background: "var(--accent-soft)",
                   borderRadius: "50%",
                   color: "var(--accent)",
-                  fontWeight: 600,
-                  fontSize: "0.85rem",
-                  letterSpacing: "-0.02em",
+                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.02em",
+                  fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+                  border: "1px solid rgba(122,255,142,0.2)",
                 }}
               >
                 {profile.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <div
-                  className="text-[0.825rem] font-semibold truncate"
-                  style={{
-                    color: "var(--text-primary)",
-                    letterSpacing: "-0.015em",
-                  }}
+                  className="text-[0.8rem] font-semibold truncate"
+                  style={{ color: "var(--text-primary)", letterSpacing: "-0.015em" }}
                 >
                   {profile.name}
                 </div>
                 <div
-                  className="text-[0.7rem] mt-0.5"
-                  style={{ color: "var(--text-tertiary)" }}
+                  className="text-[0.65rem] mt-0.5"
+                  style={{
+                    color: "var(--text-muted)",
+                    fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
                 >
-                  Personal
+                  Local
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="transition-opacity hover:opacity-100 opacity-50"
+                className="transition-opacity hover:opacity-100 opacity-30"
                 style={{ color: "var(--text-tertiary)" }}
                 title="Switch profile"
               >
-                <LogOut size={14} />
+                <LogOut size={13} />
               </button>
             </div>
           </div>
@@ -192,7 +218,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         className="flex-1 overflow-y-auto"
         style={{ background: "var(--bg)" }}
       >
-        <div className="animate-in mx-auto" style={{ maxWidth: 1100, padding: "40px 56px 80px" }}>
+        <div className="animate-in mx-auto" style={{ maxWidth: 1120, padding: "44px 64px 96px" }}>
           {children}
         </div>
       </main>

@@ -1,127 +1,76 @@
 @import "tailwindcss";
 
 /* ────────────────────────────────────────────────────────────────
-   Career Command Center — design tokens
-   Reference: Linear / Things 3 / Arc / Raycast.
-   Warm neutrals, single confident accent, real shadows, tactile.
-   Light + dark via prefers-color-scheme. No neon. No mono-caps cult.
+   Career Command Center — phosphor-terminal design tokens
+   Dark-first. Warm off-blacks, phosphor-green accent, semantic
+   color for signal (red / amber / green), mono-caps chrome only.
    ──────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Surfaces — warm light neutrals (stone family, slightly off-white) */
-  --bg:             #f7f6f3;
-  --surface:        #ffffff;
-  --surface-2:      #faf9f6;
-  --surface-3:      #f1efe9;
-  --surface-inset:  #ecebe4;
-  --sidebar-bg:     #f1efe9;
-  --overlay:        rgba(20, 18, 14, 0.04);
+  /* ── Surfaces — deep warm blacks, never pure #000 ── */
+  --bg:             #0c0b09;
+  --surface:        #131210;
+  --surface-2:      #1a1916;
+  --surface-3:      #222120;
+  --surface-inset:  #090807;
+  --sidebar-bg:     #0f0e0b;
+  --overlay:        rgba(255, 250, 240, 0.05);
 
-  /* Text — warm near-black, not pure */
-  --text-primary:   #14120e;
-  --text-secondary: #4a4640;
-  --text-tertiary:  #8b857b;
-  --text-muted:     #b6b1a6;
+  /* ── Text — warm phosphor whites ── */
+  --text-primary:   #f0ede6;
+  --text-secondary: #a8a39a;
+  --text-tertiary:  #6b6560;
+  --text-muted:     #3d3b37;
 
-  /* Borders — barely-there hairlines */
-  --border:         rgba(20, 18, 14, 0.08);
-  --border-strong:  rgba(20, 18, 14, 0.14);
+  /* ── Borders ── */
+  --border:         rgba(240, 237, 230, 0.07);
+  --border-strong:  rgba(240, 237, 230, 0.14);
 
-  /* Accent — confident indigo (Things 3 / Linear spirit). Used SPARINGLY. */
-  --accent:         #4f46e5;
-  --accent-rgb:     79, 70, 229;
-  --accent-soft:    rgba(79, 70, 229, 0.10);
-  --accent-hover:   #4338ca;
-  --accent-text:    #ffffff;
+  /* ── Phosphor green — the hero accent ── */
+  --accent:         #7aff8e;
+  --accent-rgb:     122, 255, 142;
+  --accent-soft:    rgba(122, 255, 142, 0.10);
+  --accent-hover:   #9effa9;
+  --accent-text:    #0c0b09;
+  --accent-glow:    0 0 20px rgba(122, 255, 142, 0.25), 0 0 40px rgba(122, 255, 142, 0.10);
 
-  /* Semantic */
-  --success:        #16a34a;
-  --warning:        #d97706;
-  --danger:         #dc2626;
+  /* ── Semantic — traffic-light signal ── */
+  --green:          #4ade80;
+  --green-soft:     rgba(74, 222, 128, 0.12);
+  --amber:          #fbbf24;
+  --amber-soft:     rgba(251, 191, 36, 0.12);
+  --red:            #f87171;
+  --red-soft:       rgba(248, 113, 113, 0.12);
+  --orange:         #fb923c;
+  --orange-soft:    rgba(251, 146, 60, 0.12);
 
-  /* Shadows — real depth, not cargo-cult borders */
-  --shadow-xs:      0 1px 2px rgba(20, 18, 14, 0.04);
-  --shadow-sm:      0 1px 3px rgba(20, 18, 14, 0.06), 0 1px 2px rgba(20, 18, 14, 0.04);
-  --shadow-md:      0 4px 12px rgba(20, 18, 14, 0.08), 0 2px 4px rgba(20, 18, 14, 0.04);
-  --shadow-lg:      0 12px 32px rgba(20, 18, 14, 0.10), 0 4px 8px rgba(20, 18, 14, 0.04);
+  /* ── Brand — Obsidian purple ── */
+  --vault-purple:   #a079ff;
+  --vault-soft:     rgba(160, 121, 255, 0.12);
+  --vault-glow:     0 0 16px rgba(160, 121, 255, 0.20);
 
-  /* Shape */
-  --radius-sm:      6px;
-  --radius:         10px;
-  --radius-lg:      14px;
-  --radius-xl:      20px;
+  /* ── Shadows — depth in the dark ── */
+  --shadow-xs:      0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-sm:      0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:      0 4px 12px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-lg:      0 12px 32px rgba(0, 0, 0, 0.8), 0 4px 8px rgba(0, 0, 0, 0.5);
+
+  /* ── Shape ── */
+  --radius-sm:      4px;
+  --radius:         8px;
+  --radius-lg:      12px;
+  --radius-xl:      18px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Surfaces — warm off-blacks, never pure #000 */
-    --bg:             #14130f;
-    --surface:        #1c1b17;
-    --surface-2:      #232220;
-    --surface-3:      #2a2926;
-    --surface-inset:  #100f0c;
-    --sidebar-bg:     #100f0c;
-    --overlay:        rgba(255, 250, 240, 0.04);
-
-    /* Text — warm off-whites */
-    --text-primary:   #f5f3ee;
-    --text-secondary: #b9b4ab;
-    --text-tertiary:  #79756d;
-    --text-muted:     #4a4640;
-
-    /* Borders */
-    --border:         rgba(245, 243, 238, 0.07);
-    --border-strong:  rgba(245, 243, 238, 0.13);
-
-    /* Accent — softer indigo for dark surfaces */
-    --accent:         #a5b4fc;
-    --accent-rgb:     165, 180, 252;
-    --accent-soft:    rgba(165, 180, 252, 0.13);
-    --accent-hover:   #c7d2fe;
-    --accent-text:    #14130f;
-
-    /* Semantic — dimmed for dark */
-    --success:        #4ade80;
-    --warning:        #fbbf24;
-    --danger:         #f87171;
-
-    /* Shadows — heavier in dark */
-    --shadow-xs:      0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-sm:      0 1px 3px rgba(0, 0, 0, 0.4);
-    --shadow-md:      0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg:      0 12px 32px rgba(0, 0, 0, 0.55);
-  }
-}
-
-/* Manual override (theme toggle, future) */
-[data-theme="light"] {
-  color-scheme: light;
-}
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg:             #14130f;
-  --surface:        #1c1b17;
-  --surface-2:      #232220;
-  --surface-3:      #2a2926;
-  --surface-inset:  #100f0c;
-  --sidebar-bg:     #100f0c;
-  --overlay:        rgba(255, 250, 240, 0.04);
-  --text-primary:   #f5f3ee;
-  --text-secondary: #b9b4ab;
-  --text-tertiary:  #79756d;
-  --text-muted:     #4a4640;
-  --border:         rgba(245, 243, 238, 0.07);
-  --border-strong:  rgba(245, 243, 238, 0.13);
-  --accent:         #a5b4fc;
-  --accent-rgb:     165, 180, 252;
-  --accent-soft:    rgba(165, 180, 252, 0.13);
-  --accent-hover:   #c7d2fe;
-  --accent-text:    #14130f;
-}
-
-/* ── Reset ─────────────────────────────────────────────────── */
+/* ── Reset ────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
 
 body {
   background: var(--bg);
@@ -130,6 +79,16 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "ss02";
   line-height: 1.55;
   letter-spacing: -0.005em;
+}
+
+/* Mono chrome — eyebrow labels ONLY, never body copy */
+.chrome {
+  font-family: 'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
 h1, h2, h3, h4 {
@@ -146,20 +105,22 @@ h3 { font-size: 1rem; }
 
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--accent-soft); color: var(--accent); }
-
 button { font: inherit; color: inherit; cursor: pointer; }
 input, textarea { font: inherit; color: inherit; }
 
-/* ── Scrollbar — quiet ─────────────────────────────────────── */
-::-webkit-scrollbar { width: 10px; height: 10px; }
+/* ── Scrollbar — dark quiet ───────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ── Utility classes ─────────────────────────────────────────── */
+/* ── Glow utilities ───────────────────────────────────────────── */
+.glow-green  { text-shadow: 0 0 12px rgba(122, 255, 142, 0.6); }
+.glow-purple { text-shadow: 0 0 12px rgba(160, 121, 255, 0.5); }
+.glow-amber  { text-shadow: 0 0 12px rgba(251, 191, 36, 0.5); }
+.glow-red    { text-shadow: 0 0 12px rgba(248, 113, 113, 0.5); }
+
 .surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
-.surface-flat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-.muted-text { color: var(--text-tertiary); }
 .tabular { font-variant-numeric: tabular-nums; }
 
 /* ── Animations ─────────────────────────────────────────────── */
@@ -167,4 +128,9 @@ input, textarea { font: inherit; color: inherit; }
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 .animate-in { animation: fadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
