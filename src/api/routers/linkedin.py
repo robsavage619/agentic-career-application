@@ -7,24 +7,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session, SQLModel, select
 
+from api.agents import run_agent
 from api.config import settings
 from api.db import get_session
 from api.models.linkedin import LinkedInPost, LinkedInToken
 from api.models.profile import Profile
-from api.services import anthropic as ai
 from api.services import linkedin as li
-from api.services import rag
 
 router = APIRouter()
 
 REDIRECT_URI = "http://localhost:8000/api/linkedin/callback"
-
-_POST_SYSTEM = """\
-You are a LinkedIn content strategist. You write authentic, engaging posts that feel
-personal and specific — not corporate. Match the author's voice from their vault context.
-Use a hook opening, provide insight or value, end with a question or call-to-action.
-Keep under 1300 characters. No hashtag spam — max 3 relevant tags.
-"""
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
@@ -143,15 +135,13 @@ async def generate_post(
     profile = session.get(Profile, data.profile_id)
     rag_tag = profile.rag_tag if profile else "rob"
 
-    rag_ctx = await rag.search(query=f"{data.topic} {data.angle}", rag_tag=rag_tag)
-
-    content = await ai.complete(
-        system_persona=_POST_SYSTEM,
-        rag_context=rag_ctx,
-        user_prompt=f"Write a LinkedIn post about: {data.topic}\nAngle: {data.angle or 'authentic professional insight'}",
-        model="claude-sonnet-4-6",
-        max_tokens=600,
+    angle = data.angle or "authentic professional insight"
+    final = await run_agent(
+        mode="draft_linkedin_post",
+        user_prompt=f"Write a LinkedIn post about: {data.topic}\nAngle: {angle}",
+        rag_tag=rag_tag,
     )
+    content = final.get("output", "")
 
     post = LinkedInPost(profile_id=data.profile_id, content=content)
     session.add(post)

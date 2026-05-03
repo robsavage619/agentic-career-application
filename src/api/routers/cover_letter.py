@@ -6,20 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response, StreamingResponse
 from sqlmodel import Session, SQLModel, select
 
+from api.agents import run_agent
 from api.db import get_session
 from api.models.cover_letter import CoverLetter
 from api.models.profile import Profile
-from api.services import anthropic as ai
-from api.services import rag
 
 router = APIRouter()
-
-_COVER_LETTER_SYSTEM = """\
-You are an expert cover letter writer. You craft compelling, specific, voice-authentic
-cover letters that feel genuinely personal — not corporate templates. Use the applicant's
-accomplishments and voice from the vault context. Focus on the specific role and company.
-Write in first person. Keep to three paragraphs + a closing. No fluff.
-"""
 
 
 class GenerateRequest(SQLModel):
@@ -72,11 +64,6 @@ async def generate_stream(
     profile = session.get(Profile, data.profile_id)
     rag_tag = profile.rag_tag if profile else "rob"
 
-    rag_ctx = await rag.search(
-        query=f"accomplishments experience {data.job_title} {data.company}",
-        rag_tag=rag_tag,
-    )
-
     user_prompt = (
         f"Write a cover letter for:\n"
         f"Role: {data.job_title}\n"
@@ -85,23 +72,23 @@ async def generate_stream(
     )
 
     async def event_stream():
-        full_text = []
-        async for chunk in ai.stream(
-            system_persona=_COVER_LETTER_SYSTEM,
-            rag_context=rag_ctx,
+        final = await run_agent(
+            mode="draft_cover_letter",
             user_prompt=user_prompt,
-        ):
-            full_text.append(chunk)
-            yield f"data: {chunk}\n\n"
+            rag_tag=rag_tag,
+            job_description=data.job_description,
+        )
+        content = final.get("output", "")
 
-        # Persist after stream completes
         letter = CoverLetter(
             profile_id=data.profile_id,
             pipeline_card_id=data.pipeline_card_id,
-            content="".join(full_text),
+            content=content,
         )
         session.add(letter)
         session.commit()
+
+        yield f"data: {content}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
