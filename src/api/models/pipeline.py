@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from sqlmodel import Field, SQLModel
 
 
-class PipelineStage(str, Enum):
+class PipelineStage(StrEnum):
     DISCOVERED = "DISCOVERED"
     APPLIED = "APPLIED"
     SCREENER = "SCREENER"

@@ -102,7 +102,7 @@ async def generate_stream(
         )
         session.add(letter)
         session.commit()
-        yield f"data: [DONE]\n\n"
+        yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 

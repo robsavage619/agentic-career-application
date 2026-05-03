@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import base64
-
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import Response
 from sqlmodel import Session, SQLModel, select
