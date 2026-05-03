@@ -27,7 +27,7 @@ const NAV = [
   { href: "/panel", icon: Users, label: "Panel review" },
 ];
 
-const MONO = "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace";
+const MONO = "'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

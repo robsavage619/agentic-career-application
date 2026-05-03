@@ -7,7 +7,7 @@ import { Sparkles, Send, Trash2, X } from "lucide-react";
 import { api, type LinkedInPost } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
-const MONO = "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace";
+const MONO = "'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace";
 
 /* ── LinkedIn logo SVG ── */
 function LinkedInLogo({ height = 22 }: { height?: number }) {

@@ -9,7 +9,7 @@ import {
 import { api, type SavedJob } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
-const MONO = "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace";
+const MONO = "'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace";
 
 const PROFILE_DEFAULTS: Record<string, { keywords: string; location: string }> = {
   rob: { keywords: "AI product manager sports", location: "Beaverton OR" },

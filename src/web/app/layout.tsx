@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import "@fontsource-variable/inter";
-import "@fontsource-variable/space-grotesk";
-import "@fontsource/jetbrains-mono/400.css";
-import "@fontsource/jetbrains-mono/500.css";
-import "@fontsource/jetbrains-mono/700.css";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import { Providers } from "./providers";
 

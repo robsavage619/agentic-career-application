@@ -700,7 +700,7 @@ function PipelineRail({ briefing, loading }: { briefing: Briefing | undefined; l
             <div key={s.key} className="flex items-center justify-between">
               <span
                 style={{
-                  fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+                  fontFamily: "'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace",
                   fontSize: "0.65rem",
                   letterSpacing: "0.06em",
                   color: "var(--text-muted)",
@@ -725,7 +725,7 @@ function PipelineRail({ briefing, loading }: { briefing: Briefing | undefined; l
             marginTop: 10,
             fontSize: "0.7rem",
             color: "var(--text-muted)",
-            fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+            fontFamily: "'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace",
             letterSpacing: "0.04em",
           }}
         >
@@ -800,7 +800,7 @@ function EmptyState({ text, cta }: { text: string; cta?: { href: string; label: 
         style={{
           fontSize: "0.825rem",
           color: "var(--text-muted)",
-          fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+          fontFamily: "'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace",
           letterSpacing: "0.03em",
         }}
       >
@@ -959,7 +959,7 @@ function StagePill({ stage }: { stage: string }) {
         fontWeight: 600,
         letterSpacing: "0.05em",
         textTransform: "uppercase",
-        fontFamily: "'Berkeley Mono', 'JetBrains Mono', monospace",
+        fontFamily: "'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace",
         border: `1px solid ${color}30`,
       }}
     >
