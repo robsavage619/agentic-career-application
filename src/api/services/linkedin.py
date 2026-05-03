@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from urllib.parse import urlencode
 
 import httpx
 
@@ -21,8 +22,7 @@ def oauth_url(redirect_uri: str, state: str) -> str:
         "state": state,
         "scope": "openid profile email w_member_social",
     }
-    query = "&".join(f"{k}={v}" for k, v in params.items())
-    return f"{AUTH_URL}?{query}"
+    return f"{AUTH_URL}?{urlencode(params)}"
 
 
 async def exchange_code(code: str, redirect_uri: str) -> dict:

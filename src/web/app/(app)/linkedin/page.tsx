@@ -719,6 +719,8 @@ export default function LinkedInPage() {
             ) : (
               <a
                 href={profileId ? api.linkedin.authUrl(profileId) : "#"}
+                target="_self"
+                rel="noreferrer"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -730,6 +732,8 @@ export default function LinkedInPage() {
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   letterSpacing: "-0.01em",
+                  cursor: "pointer",
+                  textDecoration: "none",
                 }}
               >
                 Connect LinkedIn
