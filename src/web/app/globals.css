@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  /* Neutral fallback — no profile loaded */
+  --bg:             #08090c;
+  --surface-inset:  #050609;
+  --surface:        #0e1015;
+  --surface-2:      #13151c;
+  --surface-3:      #1a1d26;
+  --surface-raised: #1f222e;
+  --sidebar-bg:     #060709;
+
+  --border:         rgba(255,255,255,0.06);
+  --border-strong:  rgba(255,255,255,0.10);
+  --border-accent:  rgba(var(--accent-rgb),0.18);
+
+  --text-primary:   #eef0f6;
+  --text-secondary: #8b8fa8;
+  --text-tertiary:  #454b63;
+  --text-muted:     #2a2d3a;
+  --text-data:      #c8d8f0;
+
+  --accent:         #c7ff00;
+  --accent-rgb:     199,255,0;
+  --accent-dim:     rgba(199,255,0,0.08);
+  --accent-glow:    rgba(199,255,0,0.12);
+
+  --radius:         10px;
+  --radius-lg:      16px;
+  --radius-card:    12px;
+}
+
+/*
+ * ── Rob — cool blue-steel ──────────────────────────────────────
+ * Analytics tool character: Linear/Vercel meets ESPN data.
+ * Volt is a SIGNAL, not wallpaper. Appears on primary metric only.
+ */
+[data-profile="rob"] {
+  --accent:         #c7ff00;
+  --accent-rgb:     199,255,0;
+  --accent-dim:     rgba(199,255,0,0.08);
+  --accent-glow:    rgba(199,255,0,0.10);
+
+  /* Distinctly blue-steel — you should see the blue */
+  --bg:             #050e1c;
+  --surface-inset:  #030a14;
+  --surface:        #091828;
+  --surface-2:      #0e2035;
+  --surface-3:      #152840;
+  --surface-raised: #1c3250;
+  --sidebar-bg:     #03080f;
+
+  --border:         rgba(100,150,220,0.08);
+  --border-strong:  rgba(100,150,220,0.13);
+  --border-accent:  rgba(199,255,0,0.14);
+
+  --text-primary:   #e8f0ff;
+  --text-secondary: #7a90b8;
+  --text-tertiary:  #3d5070;
+  --text-muted:     #1e2d42;
+  --text-data:      #b8d4ff;
+
+  --radius:         10px;
+  --radius-lg:      16px;
+  --radius-card:    12px;
+}
+
+/*
+ * ── Ari — warm aubergine ──────────────────────────────────────
+ * Editorial, considered, slightly softer. Cream text, warm purple surfaces.
+ */
+[data-profile="ari"] {
+  --accent:         #a78bfa;
+  --accent-rgb:     167,139,250;
+  --accent-dim:     rgba(167,139,250,0.10);
+  --accent-glow:    rgba(167,139,250,0.14);
+
+  /* Distinctly warm purple — you should feel the warmth */
+  --bg:             #0c0617;
+  --surface-inset:  #080412;
+  --surface:        #13092a;
+  --surface-2:      #1a0f38;
+  --surface-3:      #221547;
+  --surface-raised: #2c1c58;
+  --sidebar-bg:     #070412;
+
+  --border:         rgba(167,139,250,0.08);
+  --border-strong:  rgba(167,139,250,0.14);
+  --border-accent:  rgba(167,139,250,0.22);
+
+  --text-primary:   #f0eaff;
+  --text-secondary: #9080c0;
+  --text-tertiary:  #5040a0;
+  --text-muted:     #2c1f60;
+  --text-data:      #d8c8ff;
+
+  --radius:         14px;
+  --radius-lg:      22px;
+  --radius-card:    16px;
+}
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Space Grotesk Variable', 'Space Grotesk', 'Inter Variable', sans-serif;
+  font-feature-settings: "ss01", "ss02";
+}
+
+::selection { background: var(--accent); color: #000; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface-inset); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb),0.35); }
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}

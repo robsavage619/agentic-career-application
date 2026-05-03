@@ -1,0 +1,40 @@
+[project]
+name = "career-command-center"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlmodel>=0.0.21",
+    "alembic>=1.13.0",
+    "python-multipart>=0.0.9",
+    "python-docx>=1.1.0",
+    "anthropic>=0.40.0",
+    "httpx>=0.27.0",
+    "pydantic-settings>=2.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6.0",
+    "pyright>=1.1.380",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"

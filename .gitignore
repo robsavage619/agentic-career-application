@@ -1,3 +1,28 @@
+# ── Career Command Center ────────────────────────────────
+# Secrets
+.env.local
+.env.*.local
+
+# Personal data — DB, uploads, documents
+*.db
+*.sqlite
+*.sqlite3
+uploads/
+
+# Next.js
+src/web/.next/
+src/web/node_modules/
+src/web/out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code worktrees (ephemeral)
+.claude/worktrees/
+.claude/plans/
+# ─────────────────────────────────────────────────────────
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
