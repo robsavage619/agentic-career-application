@@ -15,7 +15,8 @@ import {
 import { useDroppable } from "@dnd-kit/core";
 import { useDraggable } from "@dnd-kit/core";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, X, ExternalLink, Clock, ChevronRight, Trash2, FileText } from "lucide-react";
+import Link from "next/link";
+import { Plus, X, ExternalLink, Clock, ChevronRight, Trash2, FileText, Users } from "lucide-react";
 import { api, type PipelineCard, type PipelineStage } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
@@ -434,23 +435,33 @@ function CardDrawer({
         {/* AI quick-actions */}
         <div
           className="rounded-xl p-3 mb-5 flex flex-col gap-2"
-          style={{ background: "rgba(var(--accent-rgb),0.05)", border: "1px solid rgba(var(--accent-rgb),0.12)" }}
+          style={{ background: "rgba(122,255,142,0.05)", border: "1px solid rgba(122,255,142,0.15)" }}
         >
           <div className="text-[0.6rem] font-semibold tracking-[0.12em] uppercase" style={{ color: "var(--accent)" }}>
             AI Actions
           </div>
-          {[
-            { icon: <FileText size={11} />, label: "Tailor Resume" },
-            { icon: <FileText size={11} />, label: "Draft Cover Letter" },
-          ].map(({ icon, label }) => (
-            <button
-              key={label}
-              className="flex items-center gap-2 text-[0.72rem] font-medium text-[#8b8fa8] hover:text-[var(--accent)] transition-colors"
-            >
-              {icon}
-              {label}
-            </button>
-          ))}
+          <Link
+            href={`/interview-prep/${card.id}`}
+            className="flex items-center gap-2 text-[0.78rem] font-medium transition-colors"
+            style={{ color: "var(--accent)" }}
+          >
+            <Users size={12} />
+            Prepare for interview
+          </Link>
+          <Link
+            href={`/resume?card=${card.id}`}
+            className="flex items-center gap-2 text-[0.72rem] font-medium text-[#8b8fa8] hover:text-[var(--accent)] transition-colors"
+          >
+            <FileText size={11} />
+            Tailor resume
+          </Link>
+          <Link
+            href={`/letters?card=${card.id}`}
+            className="flex items-center gap-2 text-[0.72rem] font-medium text-[#8b8fa8] hover:text-[var(--accent)] transition-colors"
+          >
+            <FileText size={11} />
+            Draft cover letter
+          </Link>
         </div>
 
         {/* Delete */}

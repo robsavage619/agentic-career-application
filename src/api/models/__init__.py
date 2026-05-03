@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from api.models.cover_letter import CoverLetter
+from api.models.interview_prep import InterviewPrep
 from api.models.job import Job, SavedJob
 from api.models.linkedin import LinkedInPost, LinkedInToken
 from api.models.linkedin_metrics import LinkedInConnection, LinkedInSnapshot
@@ -12,6 +13,7 @@ from api.models.resume import BaseResume, ResumeVersion
 __all__ = [
     "BaseResume",
     "CoverLetter",
+    "InterviewPrep",
     "Job",
     "LinkedInConnection",
     "LinkedInPost",

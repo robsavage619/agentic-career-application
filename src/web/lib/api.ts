@@ -224,6 +224,15 @@ export type Briefing = {
   follow_ups: BriefingFollowUp[];
 };
 
+export type InterviewPrepData = {
+  id: number;
+  pipeline_card_id: number;
+  content: string;
+  evidence: { filename: string; context: string }[];
+  vault_path: string;
+  created_at: string;
+};
+
 export type FitEvidence = { filename: string; context: string };
 export type FitScore = {
   score: number | null;
@@ -359,5 +368,19 @@ export const api = {
   decisions: {
     list: (profileId: number, limit = 50) =>
       request<DecisionLogEntry[]>(`/api/jobs/decisions?profile_id=${profileId}&limit=${limit}`),
+  },
+  interviewPrep: {
+    get: (pipelineCardId: number) =>
+      request<InterviewPrepData | null>(`/api/interview-prep/${pipelineCardId}`),
+    generate: (data: { pipeline_card_id: number; job_description?: string }) =>
+      request<InterviewPrepData>("/api/interview-prep/generate", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    writeback: (prepId: number) =>
+      request<{ written: boolean; path: string }>(
+        `/api/interview-prep/${prepId}/writeback`,
+        { method: "POST" }
+      ),
   },
 };
