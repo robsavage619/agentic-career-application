@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8001/api/linkedin/callback"
+    # Unofficial scraper auth (for metrics + connections beyond OAuth scopes)
+    linkedin_email: str = ""
+    linkedin_password: str = ""
+    linkedin_li_at_cookie: str = ""  # Alternative to email/password
     obsidian_api_port: int = 27124
     obsidian_api_key: str = ""
     database_url: str = "sqlite:///./career_command_center.db"

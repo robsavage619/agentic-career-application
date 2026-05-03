@@ -12,6 +12,7 @@ from api.routers import (
     fit,
     jobs,
     linkedin,
+    linkedin_metrics,
     panel,
     pipeline,
     profiles,
@@ -42,6 +43,7 @@ app.include_router(resume.router, prefix="/api/resume", tags=["resume"])
 app.include_router(cover_letter.router, prefix="/api/cover-letter", tags=["cover-letter"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(linkedin.router, prefix="/api/linkedin", tags=["linkedin"])
+app.include_router(linkedin_metrics.router, prefix="/api/linkedin", tags=["linkedin"])
 app.include_router(panel.router, prefix="/api/panel", tags=["panel"])
 app.include_router(fit.router, prefix="/api/fit", tags=["fit"])
 

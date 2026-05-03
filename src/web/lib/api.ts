@@ -93,6 +93,46 @@ export type LinkedInPost = {
   created_at: string;
 };
 
+export type LinkedInMetricsSnapshot = {
+  follower_count: number;
+  connection_count: number;
+  profile_views_7d: number;
+  search_appearances_7d: number;
+  captured_at: string;
+};
+
+export type LinkedInMetricsHistoryPoint = {
+  follower_count: number;
+  connection_count: number;
+  captured_at: string;
+};
+
+export type LinkedInMetrics = {
+  latest: LinkedInMetricsSnapshot | null;
+  history: LinkedInMetricsHistoryPoint[];
+  configured: boolean;
+};
+
+export type LinkedInConnection = {
+  urn: string;
+  public_id: string;
+  full_name: string;
+  headline: string;
+  current_company: string;
+  current_title: string;
+  location: string;
+  industry: string;
+  picture_url: string;
+};
+
+export type NetworkBreakdown = {
+  total: number;
+  top_companies: [string, number][];
+  top_locations: [string, number][];
+  top_industries: [string, number][];
+  top_titles: [string, number][];
+};
+
 export type LinkedInStatus = {
   connected: boolean;
   urn?: string;
@@ -290,6 +330,16 @@ export const api = {
     deletePost: (id: number) => fetch(`${BASE}/api/linkedin/posts/${id}`, { method: "DELETE" }),
     refreshProfile: (profileId: number) =>
       request<LinkedInStatus>(`/api/linkedin/profile/refresh/${profileId}`, { method: "POST" }),
+    getMetrics: (profileId: number) =>
+      request<LinkedInMetrics>(`/api/linkedin/metrics/${profileId}`),
+    syncMetrics: (profileId: number) =>
+      request<LinkedInMetricsSnapshot>(`/api/linkedin/metrics/sync/${profileId}`, { method: "POST" }),
+    syncConnections: (profileId: number) =>
+      request<{ synced: number }>(`/api/linkedin/connections/sync/${profileId}`, { method: "POST" }),
+    listConnections: (profileId: number) =>
+      request<LinkedInConnection[]>(`/api/linkedin/connections/${profileId}`),
+    networkBreakdown: (profileId: number) =>
+      request<NetworkBreakdown>(`/api/linkedin/network/${profileId}/breakdown`),
   },
   dashboard: {
     briefing: (profileId: number) =>

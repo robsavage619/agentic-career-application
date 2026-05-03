@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, Trash2, X, ExternalLink, RefreshCw } from "lucide-react";
-import { api, type LinkedInPost } from "@/lib/api";
+import { Sparkles, Trash2, X, ExternalLink, RefreshCw, Users, TrendingUp, Eye, Search } from "lucide-react";
+import { api, type LinkedInPost, type LinkedInMetrics, type NetworkBreakdown } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
 const MONO = "'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', 'Menlo', monospace";
@@ -422,6 +422,241 @@ function ProfileCard({ status, profileId, onRefresh }: {
   );
 }
 
+function MetricTile({
+  icon: Icon, label, value, sub, color,
+}: {
+  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+  label: string;
+  value: number | string;
+  sub?: string;
+  color: string;
+}) {
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        padding: "16px 18px 14px",
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+        <Icon size={11} style={{ color }} />
+        <span className="chrome">{label}</span>
+      </div>
+      <div
+        style={{
+          fontFamily: MONO,
+          fontVariantNumeric: "tabular-nums",
+          fontSize: "1.85rem",
+          fontWeight: 700,
+          letterSpacing: "-0.04em",
+          lineHeight: 1,
+          color,
+          textShadow: `0 0 14px ${color}`,
+        }}
+      >
+        {value}
+      </div>
+      {sub && (
+        <div style={{ fontFamily: MONO, fontSize: "0.6rem", color: "var(--text-muted)", letterSpacing: "0.04em", marginTop: 4 }}>
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MetricsPanel({ profileId }: { profileId: number }) {
+  const qc = useQueryClient();
+  const { data: metrics, isLoading } = useQuery<LinkedInMetrics>({
+    queryKey: ["linkedin-metrics", profileId],
+    queryFn: () => api.linkedin.getMetrics(profileId),
+  });
+
+  const { mutate: sync, isPending: syncing } = useMutation({
+    mutationFn: () => api.linkedin.syncMetrics(profileId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["linkedin-metrics", profileId] }),
+  });
+
+  if (isLoading) return null;
+  const latest = metrics?.latest;
+  const configured = metrics?.configured ?? false;
+
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-lg)",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 18px 12px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <span className="chrome">Metrics · {latest ? new Date(latest.captured_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "no snapshot"}</span>
+        <button
+          onClick={() => sync()}
+          disabled={syncing || !configured}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "5px 11px",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid rgba(122,255,142,0.25)",
+            background: "var(--accent-soft)",
+            color: "var(--accent)",
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            cursor: syncing || !configured ? "not-allowed" : "pointer",
+            opacity: syncing || !configured ? 0.5 : 1,
+          }}
+        >
+          <RefreshCw size={11} className={syncing ? "animate-spin" : ""} />
+          {syncing ? "Syncing…" : !configured ? "Not configured" : latest ? "Resync" : "Pull metrics"}
+        </button>
+      </div>
+      {latest ? (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--border)" }}>
+          <MetricTile icon={Users} label="FOLLOWERS" value={latest.follower_count.toLocaleString()} color="var(--accent)" />
+          <MetricTile icon={Users} label="CONNECTIONS" value={latest.connection_count.toLocaleString()} color="var(--green)" />
+          <MetricTile icon={Eye} label="PROFILE VIEWS" value={latest.profile_views_7d.toLocaleString()} sub="LAST 7D" color="var(--amber)" />
+          <MetricTile icon={Search} label="SEARCH HITS" value={latest.search_appearances_7d.toLocaleString()} sub="LAST 7D" color="var(--vault-purple)" />
+        </div>
+      ) : (
+        <div style={{
+          padding: "18px",
+          fontFamily: MONO,
+          fontSize: "0.72rem",
+          color: "var(--text-muted)",
+          letterSpacing: "0.03em",
+        }}>
+          {configured
+            ? "No snapshot yet — pull metrics to see follower count, connection count, profile views, and search appearances."
+            : "Set LINKEDIN_LI_AT_COOKIE in .env.local to enable metrics sync."}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BreakdownColumn({ title, items, max }: {
+  title: string; items: [string, number][]; max: number;
+}) {
+  return (
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="chrome" style={{ marginBottom: 10 }}>{title}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {items.slice(0, 8).map(([name, count]) => (
+          <div key={name} style={{ position: "relative", padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+            <div style={{
+              position: "absolute",
+              left: 0, top: 0, bottom: 0,
+              width: `${(count / max) * 100}%`,
+              background: "rgba(122,255,142,0.06)",
+              borderRadius: "var(--radius-sm)",
+              pointerEvents: "none",
+            }} />
+            <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", letterSpacing: "-0.005em" }}>
+                {name}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--accent)", fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                {count}
+              </span>
+            </div>
+          </div>
+        ))}
+        {items.length === 0 && (
+          <span style={{ fontFamily: MONO, fontSize: "0.65rem", color: "var(--text-muted)", letterSpacing: "0.04em" }}>—</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NetworkPanel({ profileId }: { profileId: number }) {
+  const qc = useQueryClient();
+  const { data: breakdown, isLoading } = useQuery<NetworkBreakdown>({
+    queryKey: ["linkedin-network", profileId],
+    queryFn: () => api.linkedin.networkBreakdown(profileId),
+  });
+
+  const { mutate: sync, isPending: syncing } = useMutation({
+    mutationFn: () => api.linkedin.syncConnections(profileId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["linkedin-network", profileId] }),
+  });
+
+  if (isLoading || !breakdown) return null;
+  const max = Math.max(
+    1,
+    ...breakdown.top_companies.map(([, n]) => n),
+    ...breakdown.top_locations.map(([, n]) => n),
+    ...breakdown.top_titles.map(([, n]) => n),
+  );
+
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-lg)",
+        padding: "16px 20px 18px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <TrendingUp size={13} style={{ color: "var(--accent)" }} />
+          <span className="chrome">Network breakdown</span>
+          <span style={{ fontFamily: MONO, fontSize: "0.65rem", color: "var(--text-muted)", letterSpacing: "0.04em" }}>
+            · {breakdown.total} CONNECTIONS INDEXED
+          </span>
+        </div>
+        <button
+          onClick={() => sync()}
+          disabled={syncing}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "5px 11px",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--border)",
+            background: "var(--surface-2)",
+            color: "var(--text-tertiary)",
+            fontSize: "0.72rem",
+            fontWeight: 500,
+            cursor: syncing ? "not-allowed" : "pointer",
+            opacity: syncing ? 0.5 : 1,
+          }}
+        >
+          <RefreshCw size={11} className={syncing ? "animate-spin" : ""} />
+          {syncing ? "Syncing…" : "Resync"}
+        </button>
+      </div>
+      {breakdown.total === 0 ? (
+        <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--text-muted)", letterSpacing: "0.03em" }}>
+          No connections indexed yet — click Resync to pull your network. This can take a minute or two.
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 16 }}>
+          <BreakdownColumn title="Top companies" items={breakdown.top_companies} max={max} />
+          <BreakdownColumn title="Top titles" items={breakdown.top_titles} max={max} />
+          <BreakdownColumn title="Top locations" items={breakdown.top_locations} max={max} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LinkedInPage() {
   const profile = useProfile();
   const profileId = profile?.id;
@@ -532,6 +767,14 @@ export default function LinkedInPage() {
           profileId={profileId!}
           onRefresh={() => refetchStatus()}
         />
+      )}
+
+      {/* Metrics + Network */}
+      {liStatus?.connected && profileId && (
+        <>
+          <MetricsPanel profileId={profileId} />
+          <NetworkPanel profileId={profileId} />
+        </>
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 16, flex: 1, minHeight: 0 }}>
