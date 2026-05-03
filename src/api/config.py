@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     linkedin_email: str = ""
     linkedin_password: str = ""
     linkedin_li_at_cookie: str = ""  # Alternative to email/password
+    linkedin_jsessionid: str = ""  # Required alongside li_at for CSRF
     obsidian_api_port: int = 27124
     obsidian_api_key: str = ""
     database_url: str = "sqlite:///./career_command_center.db"

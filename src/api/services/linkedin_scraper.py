@@ -28,8 +28,13 @@ def _get_client() -> Any:
 
     from linkedin_api import Linkedin
 
-    if settings.linkedin_li_at_cookie:
-        _client = Linkedin("", "", cookies={"li_at": settings.linkedin_li_at_cookie})
+    if settings.linkedin_li_at_cookie and settings.linkedin_jsessionid:
+        from requests.cookies import RequestsCookieJar
+        jsess = settings.linkedin_jsessionid.strip().strip('"')
+        jar = RequestsCookieJar()
+        jar.set("li_at", settings.linkedin_li_at_cookie.strip(), domain=".linkedin.com", path="/")
+        jar.set("JSESSIONID", f'"{jsess}"', domain=".linkedin.com", path="/")
+        _client = Linkedin("", "", cookies=jar)
     elif settings.linkedin_email and settings.linkedin_password:
         _client = Linkedin(settings.linkedin_email, settings.linkedin_password)
     else:
@@ -50,30 +55,49 @@ def is_configured() -> bool:
 # ── Metrics ─────────────────────────────────────────────────────────────────
 
 
-def fetch_metrics(public_id: str) -> dict:
+def fetch_metrics(public_id: str = "", urn_id: str = "") -> dict:
     """Pull follower count, connection count, profile views.
 
-    Returns: {follower_count, connection_count, profile_views_7d, search_appearances_7d}
+    Resolves the user's vanity slug from /me when not provided, since the
+    voyager profile endpoint requires it (OIDC sub != voyager URN format).
     """
     client = _get_client()
 
+    # Step 1: resolve a usable public_id from /me if we don't have one
+    if not public_id:
+        try:
+            me = client.get_user_profile() or {}
+            mini = me.get("miniProfile", {}) or me
+            public_id = (
+                mini.get("publicIdentifier", "")
+                or me.get("publicIdentifier", "")
+                or me.get("public_identifier", "")
+            )
+            log.info("Resolved LinkedIn public_id from /me: %s", public_id)
+        except Exception as e:
+            log.warning("LinkedIn /me lookup failed: %s", e)
+
+    # Step 2: profile detail (views, search appearances)
+    profile: dict = {}
+    if public_id:
+        try:
+            profile = client.get_profile(public_id=public_id) or {}
+        except Exception as e:
+            log.warning("LinkedIn get_profile failed: %s", e)
+
+    profile_views_7d = profile.get("profileViewsLast7Days", 0)
+    search_appearances_7d = profile.get("searchAppearancesLast7Days", 0)
+
+    # Step 3: follower + connection count
     follower_count = 0
     connection_count = 0
-    try:
-        followers = client.get_profile_network_info(public_id)
-        follower_count = followers.get("followersCount", 0)
-        connection_count = followers.get("connectionsCount", 0)
-    except Exception as e:
-        log.warning("LinkedIn network info failed: %s", e)
-
-    profile_views_7d = 0
-    search_appearances_7d = 0
-    try:
-        profile = client.get_profile(public_id)
-        profile_views_7d = profile.get("profileViewsLast7Days", 0)
-        search_appearances_7d = profile.get("searchAppearancesLast7Days", 0)
-    except Exception as e:
-        log.warning("LinkedIn profile metrics failed: %s", e)
+    if public_id:
+        try:
+            followers = client.get_profile_network_info(public_id) or {}
+            follower_count = followers.get("followersCount", 0)
+            connection_count = followers.get("connectionsCount", 0)
+        except Exception as e:
+            log.warning("LinkedIn network info failed: %s", e)
 
     return {
         "follower_count": follower_count,

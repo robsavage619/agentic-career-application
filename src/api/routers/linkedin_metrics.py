@@ -61,13 +61,27 @@ def sync_metrics(profile_id: int, session: Session = Depends(get_session)) -> di
     token = session.exec(
         select(LinkedInToken).where(LinkedInToken.profile_id == profile_id)
     ).first()
-    if not token or not token.li_vanity_name:
-        raise HTTPException(
-            status_code=409,
-            detail="OAuth-connect LinkedIn first so we know your vanity slug",
-        )
+    if not token:
+        raise HTTPException(status_code=409, detail="OAuth-connect LinkedIn first")
 
-    metrics = linkedin_scraper.fetch_metrics(token.li_vanity_name)
+    # Prefer vanity slug; fall back to URN id (extracted from urn:li:person:xxx)
+    urn_id = token.linkedin_urn.replace("urn:li:person:", "") if token.linkedin_urn else ""
+    if not token.li_vanity_name and not urn_id:
+        raise HTTPException(status_code=409, detail="No LinkedIn identifier available")
+
+    metrics = linkedin_scraper.fetch_metrics(
+        public_id=token.li_vanity_name,
+        urn_id=urn_id,
+    )
+    if all(metrics[k] == 0 for k in ("follower_count", "connection_count", "profile_views_7d")):
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "LinkedIn scraper returned no data. Cookies may be stale or "
+                "rate-limited — grab a fresh li_at + JSESSIONID from your "
+                "browser and update .env.local."
+            ),
+        )
     snap = LinkedInSnapshot(
         profile_id=profile_id,
         follower_count=metrics["follower_count"],
