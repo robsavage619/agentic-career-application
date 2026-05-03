@@ -375,6 +375,11 @@ export const api = {
         `/api/dashboard/briefing/writeback?profile_id=${profileId}`,
         { method: "POST" }
       ),
+    writebackDigest: (profileId: number) =>
+      request<{ written: boolean; path: string }>(
+        `/api/dashboard/digest/writeback?profile_id=${profileId}`,
+        { method: "POST" }
+      ),
   },
   fit: {
     score: (data: { profile_id: number; job_description: string; job_title?: string; company?: string }) =>

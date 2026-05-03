@@ -37,6 +37,7 @@ export default function DashboardPage() {
   });
 
   const [writingBack, setWritingBack] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [writingDigest, setWritingDigest] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   async function handleWriteback() {
     if (!profileId) return;
@@ -48,6 +49,19 @@ export default function DashboardPage() {
     } catch {
       setWritingBack("error");
       setTimeout(() => setWritingBack("idle"), 2400);
+    }
+  }
+
+  async function handleDigest() {
+    if (!profileId) return;
+    setWritingDigest("saving");
+    try {
+      const r = await api.dashboard.writebackDigest(profileId);
+      setWritingDigest(r.written ? "saved" : "error");
+      setTimeout(() => setWritingDigest("idle"), 2400);
+    } catch {
+      setWritingDigest("error");
+      setTimeout(() => setWritingDigest("idle"), 2400);
     }
   }
 
@@ -70,6 +84,8 @@ export default function DashboardPage() {
           onRefresh={() => briefingQuery.refetch()}
           onWriteback={handleWriteback}
           writingBack={writingBack}
+          onDigest={handleDigest}
+          writingDigest={writingDigest}
           profileName={profile.name}
         />
 
@@ -151,7 +167,7 @@ function getVerdict(b: Briefing | undefined): Verdict {
 }
 
 function HeroCard({
-  verdict, briefing, loading, fetching, onRefresh, onWriteback, writingBack, profileName,
+  verdict, briefing, loading, fetching, onRefresh, onWriteback, writingBack, onDigest, writingDigest, profileName,
 }: {
   verdict: Verdict;
   briefing: Briefing | undefined;
@@ -160,6 +176,8 @@ function HeroCard({
   onRefresh: () => void;
   onWriteback: () => void;
   writingBack: "idle" | "saving" | "saved" | "error";
+  onDigest: () => void;
+  writingDigest: "idle" | "saving" | "saved" | "error";
   profileName: string;
 }) {
   const chips = buildWhyChips(briefing);
@@ -242,6 +260,33 @@ function HeroCard({
             Refresh
           </button>
           <button
+            onClick={onDigest}
+            disabled={writingDigest === "saving"}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 10px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid rgba(160,121,255,0.3)",
+              background: "rgba(160,121,255,0.08)",
+              color: "var(--vault-purple)",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              cursor: writingDigest === "saving" ? "not-allowed" : "pointer",
+            }}
+            title="Write last 7 days as a digest to the vault"
+          >
+            {writingDigest === "saving" ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : writingDigest === "saved" ? (
+              <CheckCircle2 size={12} />
+            ) : (
+              <FileDown size={12} />
+            )}
+            {writingDigest === "saved" ? "Digest saved" : writingDigest === "error" ? "Offline" : "Weekly digest"}
+          </button>
+          <button
             onClick={onWriteback}
             disabled={writingBack === "saving"}
             style={{
@@ -265,7 +310,7 @@ function HeroCard({
             ) : (
               <FileDown size={12} />
             )}
-            {writingBack === "saved" ? "Saved" : writingBack === "error" ? "Offline" : "Save to vault"}
+            {writingBack === "saved" ? "Saved" : writingBack === "error" ? "Offline" : "Save briefing"}
           </button>
         </div>
       </div>

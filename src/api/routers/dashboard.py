@@ -158,6 +158,141 @@ async def writeback_briefing(
     return WritebackResponse(written=ok, path=path)
 
 
+@router.post("/digest/writeback", response_model=WritebackResponse)
+async def writeback_weekly_digest(
+    profile_id: int,
+    session: Session = Depends(get_session),
+) -> WritebackResponse:
+    """Render last-7-days activity as a markdown digest, write to vault."""
+    profile = session.get(Profile, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    now = datetime.utcnow()
+    since = now - timedelta(days=7)
+    body = _render_weekly_digest(session, profile, since, now)
+    week = now.date().isoformat()
+    path = f"career/digests/{week}-weekly.md"
+    ok = await rag.vault_write(path, body)
+    return WritebackResponse(written=ok, path=path)
+
+
+def _render_weekly_digest(
+    session: Session, profile: Profile, since: datetime, now: datetime
+) -> str:
+    """Compose a markdown digest of last-7-days pipeline activity."""
+    profile_id = profile.id or 0
+
+    # New cards added in window
+    new_cards = session.exec(
+        select(PipelineCard)
+        .where(PipelineCard.profile_id == profile_id)
+        .where(PipelineCard.created_at >= since)  # type: ignore[arg-type]
+        .order_by(PipelineCard.created_at.desc())  # type: ignore[attr-defined]
+    ).all()
+
+    # Cards updated (moved stages) in window
+    updated_cards = session.exec(
+        select(PipelineCard)
+        .where(PipelineCard.profile_id == profile_id)
+        .where(PipelineCard.updated_at >= since)  # type: ignore[arg-type]
+        .order_by(PipelineCard.updated_at.desc())  # type: ignore[attr-defined]
+    ).all()
+
+    # New saved jobs in window
+    new_jobs = session.exec(
+        select(SavedJob, Job)
+        .join(Job, SavedJob.job_id == Job.id)  # type: ignore[arg-type]
+        .where(SavedJob.profile_id == profile_id)
+        .where(SavedJob.saved_at >= since)  # type: ignore[arg-type]
+        .where(SavedJob.dismissed == False)  # noqa: E712
+        .order_by(SavedJob.saved_at.desc())  # type: ignore[attr-defined]
+    ).all()
+
+    # Decisions in window
+    decisions = session.exec(
+        select(SavedJob, Job)
+        .join(Job, SavedJob.job_id == Job.id)  # type: ignore[arg-type]
+        .where(SavedJob.profile_id == profile_id)
+        .where(SavedJob.decided_at >= since)  # type: ignore[arg-type]
+        .order_by(SavedJob.decided_at.desc())  # type: ignore[attr-defined]
+    ).all()
+
+    # Pipeline state at end of window
+    open_count = _count_open_cards(session, profile_id)
+    by_stage: dict[str, int] = {}
+    for stage in PipelineStage:
+        n = len(session.exec(
+            select(PipelineCard)
+            .where(PipelineCard.profile_id == profile_id)
+            .where(PipelineCard.stage == stage)
+        ).all())
+        by_stage[stage.value] = n
+
+    week_label = f"{since.date().isoformat()} → {now.date().isoformat()}"
+    lines: list[str] = [
+        "---",
+        f"week: {now.date().isoformat()}",
+        f"profile: {profile.name}",
+        "tags: [career/digest]",
+        "---",
+        "",
+        f"# Weekly Digest — {week_label}",
+        "",
+        "## At a glance",
+        f"- **Pipeline open:** {open_count}",
+        f"- **New cards:** {len(new_cards)}",
+        f"- **New saved jobs:** {len(new_jobs)}",
+        f"- **Stage moves:** {len(updated_cards)}",
+        f"- **Decisions logged:** {len(decisions)}",
+        "",
+        "## Pipeline by stage",
+    ]
+    for stage, n in by_stage.items():
+        lines.append(f"- `{stage}`: {n}")
+    lines.append("")
+
+    lines.append("## New cards this week")
+    if new_cards:
+        for c in new_cards:
+            link = f"[{c.title} @ {c.company}]({c.url})" if c.url else f"**{c.title} @ {c.company}**"
+            lines.append(f"- {link} — _{c.stage.value}_, added {c.created_at.date().isoformat()}")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## Stage moves")
+    if updated_cards:
+        for c in updated_cards[:25]:
+            link = f"[{c.title} @ {c.company}]({c.url})" if c.url else f"**{c.title} @ {c.company}**"
+            lines.append(f"- {link} → `{c.stage.value}` ({c.updated_at.date().isoformat()})")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## Decisions logged")
+    if decisions:
+        for sj, job in decisions[:30]:
+            verb = "dismissed" if sj.dismissed else "saved"
+            reason = f" — _{sj.dismiss_reason}_" if sj.dismiss_reason else ""
+            lines.append(f"- **{verb}** [{job.title} @ {job.company}]({job.url or ''}){reason}")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## New jobs this week")
+    if new_jobs:
+        for sj, job in new_jobs[:25]:
+            score = f" · score {sj.score:.2f}" if sj.score is not None else ""
+            link = f"[{job.title} @ {job.company}]({job.url})" if job.url else f"**{job.title} @ {job.company}**"
+            lines.append(f"- {link}{score}")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
 def _render_briefing_markdown(profile: Profile, b: Briefing) -> str:
     date = b.generated_at[:10]
     lines: list[str] = [

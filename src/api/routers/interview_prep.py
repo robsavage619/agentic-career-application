@@ -17,6 +17,9 @@ from api.models.pipeline import PipelineCard
 from api.models.profile import Profile
 from api.services.rag import vault_write
 
+# Profile is imported but only used in type hints; keep for clarity
+_ = Profile
+
 router = APIRouter()
 
 
@@ -115,7 +118,7 @@ async def generate_prep(
 
 
 @router.post("/{prep_id}/writeback")
-def writeback_prep(prep_id: int, session: Session = Depends(get_session)) -> dict:
+async def writeback_prep(prep_id: int, session: Session = Depends(get_session)) -> dict:
     prep = session.get(InterviewPrep, prep_id)
     if not prep:
         raise HTTPException(status_code=404, detail="Not found")
@@ -132,9 +135,7 @@ def writeback_prep(prep_id: int, session: Session = Depends(get_session)) -> dic
         f"_Generated {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}_\n\n"
         f"{prep.content}\n"
     )
-    profile = session.get(Profile, prep.profile_id)
-    rag_tag = profile.rag_tag if profile else "rob"
-    written = vault_write(path, body, rag_tag=rag_tag)
+    written = await vault_write(path, body)
 
     if written:
         prep.vault_path = path
