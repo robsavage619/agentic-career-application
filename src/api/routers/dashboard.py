@@ -9,6 +9,7 @@ from api.db import get_session
 from api.models.job import Job, SavedJob
 from api.models.pipeline import PipelineCard, PipelineStage
 from api.models.profile import Profile
+from api.services import rag
 
 router = APIRouter()
 
@@ -92,15 +93,13 @@ def get_dashboard() -> dict:
     return {"insights": []}
 
 
-@router.get("/briefing", response_model=Briefing)
-def get_briefing(
-    profile_id: int,
-    session: Session = Depends(get_session),
-) -> Briefing:
-    profile = session.get(Profile, profile_id)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
+class WritebackResponse(SQLModel):
+    written: bool
+    path: str
 
+
+def _build_briefing(session: Session, profile: Profile) -> Briefing:
+    profile_id = profile.id or 0
     now = datetime.utcnow()
     new_cutoff = now - timedelta(hours=NEW_JOB_WINDOW_HOURS)
     deadline_cutoff = now + timedelta(hours=DEADLINE_WINDOW_HOURS)
@@ -127,6 +126,99 @@ def get_briefing(
         stalled_cards=stalled,
         follow_ups=follow_ups,
     )
+
+
+@router.get("/briefing", response_model=Briefing)
+def get_briefing(
+    profile_id: int,
+    session: Session = Depends(get_session),
+) -> Briefing:
+    profile = session.get(Profile, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return _build_briefing(session, profile)
+
+
+@router.post("/briefing/writeback", response_model=WritebackResponse)
+async def writeback_briefing(
+    profile_id: int,
+    session: Session = Depends(get_session),
+) -> WritebackResponse:
+    """Render today's briefing as markdown and write it to the Obsidian vault.
+
+    Path: `career/briefings/YYYY-MM-DD.md` (overwrites if same-day).
+    """
+    profile = session.get(Profile, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    briefing = _build_briefing(session, profile)
+    path = f"career/briefings/{datetime.utcnow().date().isoformat()}.md"
+    body = _render_briefing_markdown(profile, briefing)
+    ok = await rag.vault_write(path, body)
+    return WritebackResponse(written=ok, path=path)
+
+
+def _render_briefing_markdown(profile: Profile, b: Briefing) -> str:
+    date = b.generated_at[:10]
+    lines: list[str] = [
+        "---",
+        f"date: {date}",
+        f"profile: {profile.name}",
+        "tags: [career/briefing]",
+        "---",
+        "",
+        f"# Daily Briefing — {date}",
+        "",
+        f"**Pipeline:** {b.counts.pipeline_open} open · "
+        f"**New jobs:** {b.counts.new_jobs} · "
+        f"**Deadlines today:** {b.counts.deadlines_today} · "
+        f"**Stalled:** {b.counts.stalled_cards} · "
+        f"**Follow-ups:** {b.counts.follow_ups}",
+        "",
+    ]
+
+    lines.append("## New jobs (24h)")
+    if b.new_jobs:
+        for j in b.new_jobs:
+            score = f" · score {j.score:.2f}" if j.score is not None else ""
+            link = f"[{j.title} @ {j.company}]({j.url})" if j.url else f"{j.title} @ {j.company}"
+            loc = f" — {j.location}" if j.location else ""
+            lines.append(f"- {link}{loc}{score}")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## Deadlines today")
+    if b.deadlines_today:
+        for c in b.deadlines_today:
+            when = c.deadline[:16].replace("T", " ") if c.deadline else "?"
+            link = f"[{c.title} @ {c.company}]({c.url})" if c.url else f"{c.title} @ {c.company}"
+            lines.append(f"- **{when}** — {link} _({c.stage})_")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## Stalled cards (>7d)")
+    if b.stalled_cards:
+        for c in b.stalled_cards:
+            link = f"[{c.title} @ {c.company}]({c.url})" if c.url else f"{c.title} @ {c.company}"
+            lines.append(f"- {link} — {c.days_since_update}d in `{c.stage}`")
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    lines.append("## Follow-ups owed")
+    if b.follow_ups:
+        for f in b.follow_ups:
+            lines.append(
+                f"- **{f.title} @ {f.company}** _({f.stage}, {f.days_in_stage}d)_ — "
+                f"{f.suggested_action}"
+            )
+    else:
+        lines.append("_None._")
+    lines.append("")
+
+    return "\n".join(lines)
 
 
 # ── Queries ─────────────────────────────────────────────────────────────────

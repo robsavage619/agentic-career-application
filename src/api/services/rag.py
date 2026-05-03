@@ -69,6 +69,32 @@ async def vault_read(path: str) -> str:
     return ""
 
 
+async def vault_write(path: str, content: str) -> bool:
+    """Write (overwrite) a markdown note in the vault at `path`.
+
+    Uses the Obsidian Local REST API PUT endpoint. Returns True on success,
+    False on any failure — the agent must degrade gracefully if the vault is
+    offline. Caller is responsible for sane path construction (trailing
+    `.md`, no leading `/`, no `..`).
+    """
+    if not path or path.startswith("/") or ".." in path:
+        log.warning("vault_write rejected suspicious path: %r", path)
+        return False
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.put(
+                f"{_base()}/vault/{path}",
+                content=content.encode("utf-8"),
+                headers={**_headers(), "Content-Type": "text/markdown"},
+            )
+            if r.is_success:
+                return True
+            log.warning("vault_write %s: %s", r.status_code, r.text[:200])
+    except Exception as exc:
+        log.warning("vault_write unreachable: %s", exc)
+    return False
+
+
 async def vault_list_recent(limit: int = 20) -> list[str]:
     """List most-recently-modified vault note paths.
 
