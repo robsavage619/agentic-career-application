@@ -16,7 +16,7 @@ from api.services import linkedin as li
 
 router = APIRouter()
 
-REDIRECT_URI = "http://localhost:8000/api/linkedin/callback"
+REDIRECT_URI = settings.linkedin_redirect_uri
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────

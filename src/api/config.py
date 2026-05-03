@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     jsearch_rapidapi_key: str = ""
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
+    linkedin_redirect_uri: str = "http://localhost:8001/api/linkedin/callback"
     obsidian_api_port: int = 27124
     obsidian_api_key: str = ""
     database_url: str = "sqlite:///./career_command_center.db"
