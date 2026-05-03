@@ -12,6 +12,11 @@ class LinkedInToken(SQLModel, table=True):
     refresh_token: str = ""
     expires_at: datetime | None = None
     linkedin_urn: str = ""  # urn:li:person:xxx
+    # Cached profile data — populated on OAuth, refreshed on /profile endpoint
+    li_name: str = ""
+    li_headline: str = ""
+    li_picture_url: str = ""
+    li_vanity_name: str = ""  # linkedin.com/in/<vanity_name>
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 

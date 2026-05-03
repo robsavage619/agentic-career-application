@@ -96,6 +96,10 @@ export type LinkedInPost = {
 export type LinkedInStatus = {
   connected: boolean;
   urn?: string;
+  name?: string;
+  headline?: string;
+  picture_url?: string;
+  vanity_name?: string;
 };
 
 export type PanelSession = {
@@ -284,6 +288,8 @@ export const api = {
     publishPost: (id: number) =>
       request<LinkedInPost>(`/api/linkedin/posts/${id}/publish`, { method: "POST" }),
     deletePost: (id: number) => fetch(`${BASE}/api/linkedin/posts/${id}`, { method: "DELETE" }),
+    refreshProfile: (profileId: number) =>
+      request<LinkedInStatus>(`/api/linkedin/profile/refresh/${profileId}`, { method: "POST" }),
   },
   dashboard: {
     briefing: (profileId: number) =>

@@ -52,22 +52,27 @@ async def oauth_callback(
         select(LinkedInToken).where(LinkedInToken.profile_id == profile_id)
     ).first()
 
+    li_urn = f"urn:li:person:{urn}" if urn else ""
+    fields = dict(
+        access_token=access_token,
+        expires_at=datetime.utcnow() + timedelta(seconds=expires_in),
+        linkedin_urn=li_urn,
+        li_name=profile_data.get("name", ""),
+        li_headline=profile_data.get("headline", ""),
+        li_picture_url=profile_data.get("picture", ""),
+        li_vanity_name=profile_data.get("vanityName", ""),
+    )
+
     if existing:
-        existing.access_token = access_token
-        existing.expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
-        existing.linkedin_urn = f"urn:li:person:{urn}" if urn else ""
+        for k, v in fields.items():
+            setattr(existing, k, v)
         session.add(existing)
     else:
-        token = LinkedInToken(
-            profile_id=profile_id,
-            access_token=access_token,
-            expires_at=datetime.utcnow() + timedelta(seconds=expires_in),
-            linkedin_urn=f"urn:li:person:{urn}" if urn else "",
-        )
-        session.add(token)
+        session.add(LinkedInToken(profile_id=profile_id, **fields))
 
     session.commit()
-    return {"connected": True, "profile_id": profile_id}
+    # Redirect back to the LinkedIn page in the web app
+    return RedirectResponse("http://localhost:3001/linkedin")
 
 
 @router.get("/status/{profile_id}")
@@ -78,7 +83,38 @@ def auth_status(profile_id: int, session: Session = Depends(get_session)) -> dic
     if not token:
         return {"connected": False}
     expired = token.expires_at and token.expires_at < datetime.utcnow()
-    return {"connected": not expired, "urn": token.linkedin_urn}
+    return {
+        "connected": not expired,
+        "urn": token.linkedin_urn,
+        "name": token.li_name,
+        "headline": token.li_headline,
+        "picture_url": token.li_picture_url,
+        "vanity_name": token.li_vanity_name,
+    }
+
+
+@router.post("/profile/refresh/{profile_id}")
+async def refresh_profile(profile_id: int, session: Session = Depends(get_session)) -> dict:
+    """Re-fetch LinkedIn profile data and update the cache."""
+    token = session.exec(
+        select(LinkedInToken).where(LinkedInToken.profile_id == profile_id)
+    ).first()
+    if not token:
+        raise HTTPException(status_code=404, detail="LinkedIn not connected")
+
+    profile_data = await li.get_profile(token.access_token)
+    token.li_name = profile_data.get("name", token.li_name)
+    token.li_headline = profile_data.get("headline", token.li_headline)
+    token.li_picture_url = profile_data.get("picture", token.li_picture_url)
+    token.li_vanity_name = profile_data.get("vanityName", token.li_vanity_name)
+    session.add(token)
+    session.commit()
+    return {
+        "name": token.li_name,
+        "headline": token.li_headline,
+        "picture_url": token.li_picture_url,
+        "vanity_name": token.li_vanity_name,
+    }
 
 
 # ── Posts ─────────────────────────────────────────────────────────────────────

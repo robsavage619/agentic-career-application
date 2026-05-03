@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, Send, Trash2, X } from "lucide-react";
+import { Sparkles, Trash2, X, ExternalLink, RefreshCw } from "lucide-react";
 import { api, type LinkedInPost } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
@@ -310,6 +310,118 @@ function EditorPanel({ post, profileId }: { post: LinkedInPost; profileId: numbe
   );
 }
 
+function ProfileCard({ status, profileId, onRefresh }: {
+  status: import("@/lib/api").LinkedInStatus;
+  profileId: number;
+  onRefresh: () => void;
+}) {
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      await api.linkedin.refreshProfile(profileId);
+      onRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        padding: "14px 16px",
+        borderRadius: "var(--radius-lg)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      {/* Avatar */}
+      <div
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: "50%",
+          overflow: "hidden",
+          flexShrink: 0,
+          border: "2px solid rgba(10,102,194,0.3)",
+          background: "var(--surface-3)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {status.picture_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={status.picture_url} alt={status.name ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <span style={{ fontFamily: MONO, fontSize: "1rem", fontWeight: 700, color: "#0A66C2" }}>
+            {status.name?.charAt(0) ?? "?"}
+          </span>
+        )}
+      </div>
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.015em" }}>
+            {status.name || "—"}
+          </span>
+          <span
+            style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: "var(--green)",
+              boxShadow: "0 0 5px var(--green)",
+              flexShrink: 0,
+            }}
+          />
+          <span style={{ fontFamily: MONO, fontSize: "0.6rem", color: "var(--green)", letterSpacing: "0.05em" }}>
+            CONNECTED
+          </span>
+        </div>
+        {status.headline && (
+          <div style={{ fontSize: "0.775rem", color: "var(--text-tertiary)", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {status.headline}
+          </div>
+        )}
+        {status.vanity_name && (
+          <a
+            href={`https://www.linkedin.com/in/${status.vanity_name}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: "0.7rem", color: "#4d9de0", marginTop: 2 }}
+          >
+            linkedin.com/in/{status.vanity_name}
+            <ExternalLink size={10} />
+          </a>
+        )}
+      </div>
+
+      {/* Refresh */}
+      <button
+        onClick={handleRefresh}
+        disabled={refreshing}
+        style={{
+          padding: "6px",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--border)",
+          background: "transparent",
+          color: "var(--text-muted)",
+          cursor: refreshing ? "not-allowed" : "pointer",
+          opacity: refreshing ? 0.5 : 1,
+          flexShrink: 0,
+        }}
+        title="Refresh profile"
+      >
+        <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+      </button>
+    </div>
+  );
+}
+
 export default function LinkedInPage() {
   const profile = useProfile();
   const profileId = profile?.id;
@@ -317,7 +429,7 @@ export default function LinkedInPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [view, setView] = useState<"generate" | "edit">("generate");
 
-  const { data: liStatus } = useQuery({
+  const { data: liStatus, refetch: refetchStatus } = useQuery({
     queryKey: ["linkedin-status", profileId],
     queryFn: () => api.linkedin.status(profileId!),
     enabled: !!profileId,
@@ -412,6 +524,15 @@ export default function LinkedInPage() {
           </div>
         </div>
       </header>
+
+      {/* Connected profile card */}
+      {liStatus?.connected && (
+        <ProfileCard
+          status={liStatus}
+          profileId={profileId!}
+          onRefresh={() => refetchStatus()}
+        />
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 16, flex: 1, minHeight: 0 }}>
         {/* Sidebar */}
