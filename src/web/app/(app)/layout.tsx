@@ -3,24 +3,28 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import {
-  LayoutDashboard, Briefcase, KanbanSquare,
-  FileText, Mail, Network, Users, LogOut,
+  LayoutDashboard,
+  Briefcase,
+  KanbanSquare,
+  FileText,
+  Mail,
+  Network,
+  Users,
+  LogOut,
 } from "lucide-react";
-import { useProfile, useProfileActions, useApplyTheme } from "@/lib/hooks/use-profile";
+import { useProfile, useProfileActions } from "@/lib/hooks/use-profile";
 import { api } from "@/lib/api";
 import { useProfileStore } from "@/lib/stores/profile-store";
-import { getProfileIcon } from "@/components/ui/profile-icons";
 
 const NAV = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/feed",      icon: Briefcase,        label: "Job Feed" },
-  { href: "/pipeline",  icon: KanbanSquare,     label: "Pipeline" },
-  { href: "/resume",    icon: FileText,         label: "Resume" },
-  { href: "/letters",   icon: Mail,             label: "Cover Letters" },
-  { href: "/linkedin",  icon: Network,          label: "LinkedIn" },
-  { href: "/panel",     icon: Users,            label: "Expert Panel" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Today" },
+  { href: "/feed", icon: Briefcase, label: "Job feed" },
+  { href: "/pipeline", icon: KanbanSquare, label: "Pipeline" },
+  { href: "/resume", icon: FileText, label: "Resume" },
+  { href: "/letters", icon: Mail, label: "Cover letters" },
+  { href: "/linkedin", icon: Network, label: "LinkedIn" },
+  { href: "/panel", icon: Users, label: "Panel review" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -30,10 +34,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { setProfile, clearProfile } = useProfileActions();
   const profileId = useProfileStore((s) => s.profileId);
 
-  useApplyTheme(profile);
-
   useEffect(() => {
-    if (!profileId) { router.replace("/"); return; }
+    if (!profileId) {
+      router.replace("/");
+      return;
+    }
     if (!profile) {
       api.profiles.get(profileId).then(setProfile).catch(() => router.replace("/"));
     }
@@ -46,170 +51,140 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
-
       {/* ── Sidebar ── */}
       <aside
-        className="w-[200px] shrink-0 flex flex-col"
+        className="w-[232px] shrink-0 flex flex-col"
         style={{
           background: "var(--sidebar-bg)",
           borderRight: "1px solid var(--border)",
         }}
       >
-
         {/* Wordmark */}
-        <div className="px-5 pt-6 pb-5 shrink-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            {/* Accent pip — tiny identity mark */}
+        <div className="px-5 pt-6 pb-7">
+          <div className="flex items-center gap-2.5">
             <div
               style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
+                width: 22,
+                height: 22,
+                borderRadius: 6,
                 background: "var(--accent)",
-                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--accent-text)",
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                boxShadow: "var(--shadow-xs)",
               }}
-            />
+            >
+              C
+            </div>
             <span
               style={{
-                fontFamily: "'Space Grotesk Variable', sans-serif",
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                letterSpacing: "-0.03em",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                letterSpacing: "-0.025em",
                 color: "var(--text-primary)",
-                lineHeight: 1,
               }}
             >
               Career
             </span>
           </div>
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: "0.55rem",
-              fontWeight: 500,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "var(--text-tertiary)",
-              paddingLeft: 13,
-            }}
-          >
-            Command
-          </div>
         </div>
 
-        {/* Divider */}
-        <div className="mx-5 mb-3" style={{ height: 1, background: "var(--border)" }} />
-
         {/* Nav */}
-        <nav className="flex flex-col flex-1 px-3 gap-0.5 overflow-y-auto">
+        <nav className="flex flex-col flex-1 px-3 gap-0.5">
           {NAV.map(({ href, icon: Icon, label }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
                 key={href}
                 href={href}
-                className="group relative flex items-center gap-3 px-3 py-[9px] transition-all duration-150 select-none"
+                className="group flex items-center gap-2.5 px-3 py-2 transition-colors duration-150 select-none"
                 style={{
                   borderRadius: "var(--radius)",
-                  background: active ? "var(--accent-dim)" : "transparent",
-                  boxShadow: active ? "inset 2px 0 0 var(--accent)" : "none",
-                  color: active ? "var(--accent)" : "var(--text-tertiary)",
+                  background: active ? "var(--surface)" : "transparent",
+                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
+                  boxShadow: active ? "var(--shadow-xs)" : "none",
+                  border: active ? "1px solid var(--border)" : "1px solid transparent",
                 }}
               >
                 <Icon
-                  size={13}
-                  strokeWidth={active ? 2.5 : 1.75}
+                  size={16}
+                  strokeWidth={active ? 2 : 1.75}
                   style={{
-                    flexShrink: 0,
                     color: active ? "var(--accent)" : "var(--text-tertiary)",
-                    transition: "color 0.15s",
+                    flexShrink: 0,
                   }}
-                  className={active ? "" : "group-hover:!text-[var(--text-secondary)] transition-colors"}
                 />
                 <span
-                  className="text-[0.73rem] font-medium tracking-[-0.01em] truncate transition-colors"
+                  className="text-[0.875rem] truncate"
                   style={{
-                    color: active ? "var(--accent)" : "var(--text-tertiary)",
-                    fontWeight: active ? 600 : 500,
+                    fontWeight: active ? 550 : 450,
+                    letterSpacing: "-0.01em",
                   }}
                 >
-                  <span className={active ? "" : "group-hover:text-[var(--text-secondary)]"}>
-                    {label}
-                  </span>
+                  {label}
                 </span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Profile widget */}
+        {/* Profile chip */}
         {profile && (
-          <div className="mx-3 mb-3 mt-2">
-            {/* Thin separator above profile */}
-            <div className="mb-2.5" style={{ height: 1, background: "var(--border)" }} />
+          <div className="px-3 pb-3 mt-3">
             <div
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
+              className="flex items-center gap-2.5 px-3 py-2.5"
               style={{
                 background: "var(--surface)",
-                border: "1px solid var(--border-strong)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
+                boxShadow: "var(--shadow-xs)",
               }}
             >
               <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                className="flex h-8 w-8 shrink-0 items-center justify-center"
                 style={{
-                  background: "var(--accent-dim)",
-                  border: "1px solid var(--border-accent)",
+                  background: "var(--accent-soft)",
+                  borderRadius: "50%",
+                  color: "var(--accent)",
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                  letterSpacing: "-0.02em",
                 }}
               >
-                {getProfileIcon(profile.avatar_emoji, 15, profile.accent_color)}
+                {profile.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <div
-                  className="text-[0.75rem] font-semibold leading-tight truncate"
+                  className="text-[0.825rem] font-semibold truncate"
                   style={{
                     color: "var(--text-primary)",
-                    fontFamily: "'Space Grotesk Variable', sans-serif",
-                    letterSpacing: "-0.01em",
+                    letterSpacing: "-0.015em",
                   }}
                 >
                   {profile.name}
                 </div>
                 <div
-                  className="text-[0.58rem] leading-tight mt-0.5"
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: "var(--accent)",
-                    letterSpacing: "0.04em",
-                  }}
+                  className="text-[0.7rem] mt-0.5"
+                  style={{ color: "var(--text-tertiary)" }}
                 >
-                  active
+                  Personal
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="transition-opacity hover:opacity-60"
+                className="transition-opacity hover:opacity-100 opacity-50"
                 style={{ color: "var(--text-tertiary)" }}
                 title="Switch profile"
               >
-                <LogOut size={11} />
+                <LogOut size={14} />
               </button>
             </div>
           </div>
         )}
-
-        {/* Version */}
-        <div className="px-5 pb-4">
-          <span
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: "0.52rem",
-              letterSpacing: "0.14em",
-              color: "var(--text-muted)",
-            }}
-          >
-            v0.1.0
-          </span>
-        </div>
       </aside>
 
       {/* ── Main content ── */}
@@ -217,15 +192,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         className="flex-1 overflow-y-auto"
         style={{ background: "var(--bg)" }}
       >
-        <motion.div
-          key={pathname}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="h-full p-7"
-        >
+        <div className="animate-in mx-auto" style={{ maxWidth: 1100, padding: "40px 56px 80px" }}>
           {children}
-        </motion.div>
+        </div>
       </main>
     </div>
   );

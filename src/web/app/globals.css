@@ -1,146 +1,170 @@
 @import "tailwindcss";
 
-/* ── Design tokens ─────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────
+   Career Command Center — design tokens
+   Reference: Linear / Things 3 / Arc / Raycast.
+   Warm neutrals, single confident accent, real shadows, tactile.
+   Light + dark via prefers-color-scheme. No neon. No mono-caps cult.
+   ──────────────────────────────────────────────────────────────── */
+
 :root {
-  /* Neutral fallback — no profile loaded */
-  --bg:             #08090c;
-  --surface-inset:  #050609;
-  --surface:        #0e1015;
-  --surface-2:      #13151c;
-  --surface-3:      #1a1d26;
-  --surface-raised: #1f222e;
-  --sidebar-bg:     #060709;
+  /* Surfaces — warm light neutrals (stone family, slightly off-white) */
+  --bg:             #f7f6f3;
+  --surface:        #ffffff;
+  --surface-2:      #faf9f6;
+  --surface-3:      #f1efe9;
+  --surface-inset:  #ecebe4;
+  --sidebar-bg:     #f1efe9;
+  --overlay:        rgba(20, 18, 14, 0.04);
 
-  --border:         rgba(255,255,255,0.06);
-  --border-strong:  rgba(255,255,255,0.10);
-  --border-accent:  rgba(var(--accent-rgb),0.18);
+  /* Text — warm near-black, not pure */
+  --text-primary:   #14120e;
+  --text-secondary: #4a4640;
+  --text-tertiary:  #8b857b;
+  --text-muted:     #b6b1a6;
 
-  --text-primary:   #eef0f6;
-  --text-secondary: #8b8fa8;
-  --text-tertiary:  #454b63;
-  --text-muted:     #2a2d3a;
-  --text-data:      #c8d8f0;
+  /* Borders — barely-there hairlines */
+  --border:         rgba(20, 18, 14, 0.08);
+  --border-strong:  rgba(20, 18, 14, 0.14);
 
-  --accent:         #c7ff00;
-  --accent-rgb:     199,255,0;
-  --accent-dim:     rgba(199,255,0,0.08);
-  --accent-glow:    rgba(199,255,0,0.12);
+  /* Accent — confident indigo (Things 3 / Linear spirit). Used SPARINGLY. */
+  --accent:         #4f46e5;
+  --accent-rgb:     79, 70, 229;
+  --accent-soft:    rgba(79, 70, 229, 0.10);
+  --accent-hover:   #4338ca;
+  --accent-text:    #ffffff;
 
+  /* Semantic */
+  --success:        #16a34a;
+  --warning:        #d97706;
+  --danger:         #dc2626;
+
+  /* Shadows — real depth, not cargo-cult borders */
+  --shadow-xs:      0 1px 2px rgba(20, 18, 14, 0.04);
+  --shadow-sm:      0 1px 3px rgba(20, 18, 14, 0.06), 0 1px 2px rgba(20, 18, 14, 0.04);
+  --shadow-md:      0 4px 12px rgba(20, 18, 14, 0.08), 0 2px 4px rgba(20, 18, 14, 0.04);
+  --shadow-lg:      0 12px 32px rgba(20, 18, 14, 0.10), 0 4px 8px rgba(20, 18, 14, 0.04);
+
+  /* Shape */
+  --radius-sm:      6px;
   --radius:         10px;
-  --radius-lg:      16px;
-  --radius-card:    12px;
+  --radius-lg:      14px;
+  --radius-xl:      20px;
 }
 
-/*
- * ── Rob — cool blue-steel ──────────────────────────────────────
- * Analytics tool character: Linear/Vercel meets ESPN data.
- * Volt is a SIGNAL, not wallpaper. Appears on primary metric only.
- */
-[data-profile="rob"] {
-  --accent:         #c7ff00;
-  --accent-rgb:     199,255,0;
-  --accent-dim:     rgba(199,255,0,0.08);
-  --accent-glow:    rgba(199,255,0,0.10);
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surfaces — warm off-blacks, never pure #000 */
+    --bg:             #14130f;
+    --surface:        #1c1b17;
+    --surface-2:      #232220;
+    --surface-3:      #2a2926;
+    --surface-inset:  #100f0c;
+    --sidebar-bg:     #100f0c;
+    --overlay:        rgba(255, 250, 240, 0.04);
 
-  /* Distinctly blue-steel — you should see the blue */
-  --bg:             #050e1c;
-  --surface-inset:  #030a14;
-  --surface:        #091828;
-  --surface-2:      #0e2035;
-  --surface-3:      #152840;
-  --surface-raised: #1c3250;
-  --sidebar-bg:     #03080f;
+    /* Text — warm off-whites */
+    --text-primary:   #f5f3ee;
+    --text-secondary: #b9b4ab;
+    --text-tertiary:  #79756d;
+    --text-muted:     #4a4640;
 
-  --border:         rgba(100,150,220,0.08);
-  --border-strong:  rgba(100,150,220,0.13);
-  --border-accent:  rgba(199,255,0,0.14);
+    /* Borders */
+    --border:         rgba(245, 243, 238, 0.07);
+    --border-strong:  rgba(245, 243, 238, 0.13);
 
-  --text-primary:   #e8f0ff;
-  --text-secondary: #7a90b8;
-  --text-tertiary:  #3d5070;
-  --text-muted:     #1e2d42;
-  --text-data:      #b8d4ff;
+    /* Accent — softer indigo for dark surfaces */
+    --accent:         #a5b4fc;
+    --accent-rgb:     165, 180, 252;
+    --accent-soft:    rgba(165, 180, 252, 0.13);
+    --accent-hover:   #c7d2fe;
+    --accent-text:    #14130f;
 
-  --radius:         10px;
-  --radius-lg:      16px;
-  --radius-card:    12px;
+    /* Semantic — dimmed for dark */
+    --success:        #4ade80;
+    --warning:        #fbbf24;
+    --danger:         #f87171;
+
+    /* Shadows — heavier in dark */
+    --shadow-xs:      0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm:      0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md:      0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg:      0 12px 32px rgba(0, 0, 0, 0.55);
+  }
 }
 
-/*
- * ── Ari — warm aubergine ──────────────────────────────────────
- * Editorial, considered, slightly softer. Cream text, warm purple surfaces.
- */
-[data-profile="ari"] {
-  --accent:         #a78bfa;
-  --accent-rgb:     167,139,250;
-  --accent-dim:     rgba(167,139,250,0.10);
-  --accent-glow:    rgba(167,139,250,0.14);
-
-  /* Distinctly warm purple — you should feel the warmth */
-  --bg:             #0c0617;
-  --surface-inset:  #080412;
-  --surface:        #13092a;
-  --surface-2:      #1a0f38;
-  --surface-3:      #221547;
-  --surface-raised: #2c1c58;
-  --sidebar-bg:     #070412;
-
-  --border:         rgba(167,139,250,0.08);
-  --border-strong:  rgba(167,139,250,0.14);
-  --border-accent:  rgba(167,139,250,0.22);
-
-  --text-primary:   #f0eaff;
-  --text-secondary: #9080c0;
-  --text-tertiary:  #5040a0;
-  --text-muted:     #2c1f60;
-  --text-data:      #d8c8ff;
-
-  --radius:         14px;
-  --radius-lg:      22px;
-  --radius-card:    16px;
+/* Manual override (theme toggle, future) */
+[data-theme="light"] {
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:             #14130f;
+  --surface:        #1c1b17;
+  --surface-2:      #232220;
+  --surface-3:      #2a2926;
+  --surface-inset:  #100f0c;
+  --sidebar-bg:     #100f0c;
+  --overlay:        rgba(255, 250, 240, 0.04);
+  --text-primary:   #f5f3ee;
+  --text-secondary: #b9b4ab;
+  --text-tertiary:  #79756d;
+  --text-muted:     #4a4640;
+  --border:         rgba(245, 243, 238, 0.07);
+  --border-strong:  rgba(245, 243, 238, 0.13);
+  --accent:         #a5b4fc;
+  --accent-rgb:     165, 180, 252;
+  --accent-soft:    rgba(165, 180, 252, 0.13);
+  --accent-hover:   #c7d2fe;
+  --accent-text:    #14130f;
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 16px; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 body {
   background: var(--bg);
   color: var(--text-primary);
+  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "ss02";
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+
+h1, h2, h3, h4 {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--text-primary);
 }
 
-h1, h2, h3, .font-display {
-  font-family: 'Space Grotesk Variable', 'Space Grotesk', 'Inter Variable', sans-serif;
-  font-feature-settings: "ss01", "ss02";
-}
+h1 { font-size: 1.875rem; letter-spacing: -0.035em; font-weight: 650; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1rem; }
 
-::selection { background: var(--accent); color: #000; }
 a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent-soft); color: var(--accent); }
 
-/* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--surface-inset); }
-::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb),0.35); }
+button { font: inherit; color: inherit; cursor: pointer; }
+input, textarea { font: inherit; color: inherit; }
+
+/* ── Scrollbar — quiet ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Utility classes ─────────────────────────────────────────── */
+.surface { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.surface-flat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.muted-text { color: var(--text-tertiary); }
+.tabular { font-variant-numeric: tabular-nums; }
 
 /* ── Animations ─────────────────────────────────────────────── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
+.animate-in { animation: fadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
