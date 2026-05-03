@@ -287,6 +287,47 @@ function ModalField({
   );
 }
 
+/* ── Retrospective button (shown only on OFFER/CLOSED cards) ── */
+function RetroButton({ card }: { card: PipelineCard }) {
+  const retro = useMutation({
+    mutationFn: () =>
+      api.retro.generate({
+        pipeline_card_id: card.id,
+        outcome: card.stage,
+      }),
+  });
+
+  if (retro.isSuccess) {
+    return (
+      <div
+        style={{
+          fontSize: "0.7rem",
+          color: "var(--vault-purple)",
+          padding: "6px 0 0",
+          lineHeight: 1.5,
+        }}
+      >
+        ✓ Retro {retro.data.written ? "saved to vault" : "generated (vault offline)"}
+        <div style={{ marginTop: 4, color: "var(--text-tertiary)", fontSize: "0.65rem" }}>
+          {retro.data.path}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => retro.mutate()}
+      disabled={retro.isPending}
+      className="flex items-center gap-2 text-[0.72rem] font-medium transition-colors"
+      style={{ color: "var(--vault-purple)", textAlign: "left", background: "transparent", border: "none", cursor: retro.isPending ? "not-allowed" : "pointer", padding: 0 }}
+    >
+      <FileText size={11} />
+      {retro.isPending ? "Drafting retro…" : "Generate retrospective"}
+    </button>
+  );
+}
+
 /* ── Card detail drawer ── */
 function CardDrawer({
   card,
@@ -462,6 +503,9 @@ function CardDrawer({
             <FileText size={11} />
             Draft cover letter
           </Link>
+          {(card.stage === "OFFER" || card.stage === "CLOSED") && (
+            <RetroButton card={card} />
+          )}
         </div>
 
         {/* Delete */}

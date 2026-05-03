@@ -18,6 +18,7 @@ from api.routers import (
     pipeline,
     profiles,
     resume,
+    retro,
 )
 
 
@@ -48,6 +49,7 @@ app.include_router(linkedin_metrics.router, prefix="/api/linkedin", tags=["linke
 app.include_router(panel.router, prefix="/api/panel", tags=["panel"])
 app.include_router(fit.router, prefix="/api/fit", tags=["fit"])
 app.include_router(interview_prep.router, prefix="/api/interview-prep", tags=["interview-prep"])
+app.include_router(retro.router, prefix="/api/retro", tags=["retro"])
 
 
 @app.get("/api/health")

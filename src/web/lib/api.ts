@@ -391,6 +391,13 @@ export const api = {
     list: (profileId: number, limit = 50) =>
       request<DecisionLogEntry[]>(`/api/jobs/decisions?profile_id=${profileId}&limit=${limit}`),
   },
+  retro: {
+    generate: (data: { pipeline_card_id: number; outcome?: string }) =>
+      request<{ content: string; evidence: { filename: string; context: string }[]; written: boolean; path: string }>(
+        "/api/retro/generate",
+        { method: "POST", body: JSON.stringify(data) }
+      ),
+  },
   interviewPrep: {
     get: (pipelineCardId: number) =>
       request<InterviewPrepData | null>(`/api/interview-prep/${pipelineCardId}`),
