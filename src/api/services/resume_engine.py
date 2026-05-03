@@ -1,42 +1,17 @@
+"""Format-preserving resume rewrite via the agent graph."""
 from __future__ import annotations
-
-"""
-Format-preserving resume rewrite.
-
-Strategy:
-  1. Parse DOCX, extract all paragraph and table-cell text as a flat list of (obj, text) pairs.
-  2. Send the full bullet corpus + JD to Claude, get back a rewritten corpus (same count, same order).
-  3. Overwrite each paragraph/cell's text run content in-place, preserving styles and formatting.
-  4. Serialize back to bytes.
-"""
 
 import io
 import logging
 from dataclasses import dataclass
 
 from docx import Document
-from docx.oxml.ns import qn
 from docx.table import _Cell
 from docx.text.paragraph import Paragraph
 
-from api.services import anthropic as ai
-from api.services import rag
+from api.agents import run_agent
 
 log = logging.getLogger(__name__)
-
-_REWRITE_SYSTEM = """\
-You are an expert resume writer. You receive a list of numbered resume bullet points
-and a job description. Your task is to rewrite ONLY the bullet text to better match
-the target role — same structure, same voice, same length, stronger keywords.
-
-Rules:
-- Return EXACTLY the same number of lines, numbered the same way.
-- Keep the same sentence structure and approximate length.
-- Do not invent metrics or facts not implied by the original.
-- Do not change section headers (they look like "## SECTION NAME").
-- Output ONLY the numbered list. No explanations.
-"""
-
 
 @dataclass
 class _TextNode:
@@ -102,14 +77,8 @@ async def rewrite(
         log.warning("resume_engine: no text nodes found in DOCX")
         return docx_bytes
 
-    # Build numbered bullet list for Claude
+    # Build numbered bullet list for the agent
     numbered = "\n".join(f"{i + 1}. {n.text}" for i, n in enumerate(nodes))
-
-    # RAG context: pull relevant accomplishments from vault
-    rag_ctx = await rag.search(
-        query=f"resume accomplishments {rag_tag}",
-        rag_tag=rag_tag,
-    )
 
     user_prompt = (
         f"<job_description>\n{job_description[:3000]}\n</job_description>\n\n"
@@ -117,14 +86,13 @@ async def rewrite(
         "Rewrite the bullets to match this role. Return the same numbered list."
     )
 
-    response = await ai.complete(
-        system_persona=_REWRITE_SYSTEM,
-        rag_context=rag_ctx,
+    final = await run_agent(
+        mode="rewrite_resume",
         user_prompt=user_prompt,
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
+        rag_tag=rag_tag,
+        job_description=job_description,
     )
-
+    response = final.get("output", "")
     rewrites = _parse_numbered(response, expected=len(nodes))
 
     # Apply rewrites back into the document
