@@ -10,11 +10,26 @@ single-user and local-only, version bumps mark milestones rather than public rel
 
 ## [Unreleased]
 
+### Added
+- **Vault writeback** — `services/rag.vault_write(path, content)` PUTs markdown notes to the
+  Obsidian Local REST API. Path-traversal protected, degrades gracefully when offline.
+- **`POST /api/dashboard/briefing/writeback`** — renders today's briefing as a frontmatter-
+  tagged markdown note and writes to `career/briefings/YYYY-MM-DD.md` in the vault.
+  Same-day calls overwrite (daily idempotent).
+- **`POST /api/fit/explain`** — "Why this job?" inline explainer backed by the `explain_fit`
+  agent mode. Three bullets why-it-fits + two risks, vault-cited. Cheap enough to run on
+  every feed card.
+
+### Internal
+- Extracted `_build_briefing()` in `dashboard.py` so the markdown renderer and the GET
+  endpoint share one source of truth.
+- Extracted `_dedupe_evidence()` in `fit.py` shared between `/score` and `/explain`.
+
 ### Planned next
-- Vault writeback (`vault_write` helper + briefing / decision-log / retro write-backs to Obsidian)
-- Frontend integration of `/api/fit/score` (score chip + evidence cards on the feed)
+- Frontend integration of `/api/fit/score` and `/api/fit/explain` (score chip + evidence cards)
 - Agent-streaming so cover-letter SSE returns to token-by-token UX
 - Live agent-trace panel UI surfacing `state.tool_calls` and `state.evidence`
+- Decision-log writeback + outcome retrospectives to vault
 
 ---
 

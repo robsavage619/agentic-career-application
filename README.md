@@ -70,7 +70,9 @@ panel UI.
 | Feature | Endpoint | What it does |
 |---|---|---|
 | **Daily Briefing** | `GET /api/dashboard/briefing` | Start-of-day view: new jobs (24h), deadlines today, stalled cards (>7d), stage-aware follow-ups |
+| **Briefing → Vault** | `POST /api/dashboard/briefing/writeback` | Renders the briefing as markdown and writes it to `career/briefings/YYYY-MM-DD.md` |
 | **JD ↔ Evidence Fit Scoring** | `POST /api/fit/score` | 0-100 score against your vault, with strengths, gaps, and a one-line verdict |
+| **Why-this-job Explainer** | `POST /api/fit/explain` | Three bullets why-it-fits, two risks, vault-cited. Cheap enough to run on every card |
 | **Application Decision Log** | `GET /api/jobs/decisions` | Every dismiss/save with the *why*. Feedback loop for preference learning |
 | **Vault-grounded Résumé Tailoring** | `POST /api/resume/generate` | Format-preserving DOCX rewrite per JD, agent-driven |
 | **Vault-grounded Cover Letters** | `POST /api/cover-letter/generate/stream` | Three-paragraph letter, vault evidence, no clichés |
@@ -267,18 +269,18 @@ See [`WORKFLOW.md`](WORKFLOW.md) for the full ruleset.
 A full roadmap and feature catalog lives in
 `~/.claude/plans/please-review-this-application-synthetic-newt.md`. Highlights:
 
-**Tier 1 — daily-use core** (3 of 4 shipped)
+**Tier 1 — daily-use core** (4 of 4 shipped)
 
 - [x] Daily Briefing
 - [x] JD ↔ Evidence Fit Scoring
 - [x] Application Decision Log
-- [ ] Vault Writeback (briefings, decisions, retros written back to Obsidian)
+- [x] Vault Writeback — briefing renders to `career/briefings/YYYY-MM-DD.md` in your vault
 
 **Tier 2 — high-leverage rituals**
 
+- [x] "Why this job?" inline explainer on feed cards (`POST /api/fit/explain`)
 - [ ] Interview Prep mode wired to a UI flow
 - [ ] Résumé Diff View (per-card DOCX bullet diff)
-- [ ] "Why this job?" inline explainer on feed cards
 - [ ] Compensation Floor & Tracker
 
 **Tier 3 — connective tissue**
@@ -301,7 +303,7 @@ A full roadmap and feature catalog lives in
 
 |  |  |
 |---|---|
-| Tests | **24 passing** · 1 vault-enforcement parametrized over 7 modes |
+| Tests | **31 passing** · 1 vault-enforcement parametrized over 7 modes |
 | Lint | **clean** (`ruff check src tests`) |
 | Types | **basic mode**, 2 known pre-existing scaffold warnings, zero regressions |
 | Lines of code | ~3,000 Python + ~700 TypeScript |
