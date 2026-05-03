@@ -172,28 +172,8 @@ def update_post(
 
 
 @router.post("/posts/{post_id}/publish")
-async def publish_post(post_id: int, session: Session = Depends(get_session)) -> PostOut:
-    post = session.get(LinkedInPost, post_id)
-    if not post:
-        raise HTTPException(status_code=404, detail="Not found")
-
-    token = session.exec(
-        select(LinkedInToken).where(LinkedInToken.profile_id == post.profile_id)
-    ).first()
-    if not token:
-        raise HTTPException(status_code=403, detail="LinkedIn not connected")
-
-    result = await li.share_post(token.access_token, token.linkedin_urn, post.content)
-    if "error" in result:
-        raise HTTPException(status_code=502, detail=result["error"])
-
-    post.status = "posted"
-    post.posted_at = datetime.utcnow()
-    post.linkedin_post_id = result.get("id", "")
-    session.add(post)
-    session.commit()
-    session.refresh(post)
-    return _post_out(post)
+async def publish_post(post_id: int) -> None:
+    raise HTTPException(status_code=503, detail="Publishing is disabled until the app is stable")
 
 
 @router.delete("/posts/{post_id}", status_code=204)

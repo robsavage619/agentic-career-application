@@ -110,24 +110,9 @@ function PostCard({ post, selected, onSelect, onDelete, onPublish }: {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {post.status === "draft" && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onPublish(); }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              padding: "3px 9px",
-              borderRadius: 999,
-              background: "rgba(10,102,194,0.12)",
-              color: "#4d9de0",
-              border: "1px solid rgba(10,102,194,0.25)",
-              fontSize: "0.65rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            <Send size={9} /> Post
-          </button>
+          <span style={{ fontFamily: MONO, fontSize: "0.55rem", color: "var(--text-muted)", letterSpacing: "0.04em" }}>
+            DRAFT
+          </span>
         )}
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
@@ -279,27 +264,20 @@ function EditorPanel({ post, profileId }: { post: LinkedInPost; profileId: numbe
             {saving ? "Saving…" : "Save"}
           </button>
           {post.status === "draft" && (
-            <button
-              onClick={publish}
-              disabled={publishing || overLimit}
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 14px",
-                borderRadius: "var(--radius)",
-                background: "#0A66C2",
-                color: "#fff",
-                border: "none",
-                fontSize: "0.775rem",
-                fontWeight: 600,
-                cursor: publishing || overLimit ? "not-allowed" : "pointer",
-                opacity: publishing || overLimit ? 0.5 : 1,
+                fontFamily: MONO,
+                fontSize: "0.6rem",
+                letterSpacing: "0.05em",
+                color: "var(--text-muted)",
+                padding: "5px 10px",
+                borderRadius: "var(--radius-sm)",
+                border: "1px solid var(--border)",
+                background: "var(--surface-3)",
               }}
             >
-              <Send size={11} />
-              {publishing ? "Posting…" : "Post to LinkedIn"}
-            </button>
+              PUBLISH COMING SOON
+            </span>
           )}
           {post.status === "posted" && (
             <span style={{ fontFamily: MONO, fontSize: "0.65rem", color: "var(--green)", letterSpacing: "0.04em" }}>
