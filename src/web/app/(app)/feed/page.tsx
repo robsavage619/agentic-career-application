@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 import { api, type SavedJob } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
-import { usePipelineStats } from "@/lib/hooks/use-pipeline";
 
-/* ── Default search params keyed by profile rag_tag ── */
+const MONO = "'Berkeley Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Menlo', monospace";
+
 const PROFILE_DEFAULTS: Record<string, { keywords: string; location: string }> = {
   rob: { keywords: "AI product manager sports", location: "Beaverton OR" },
   ari: { keywords: "nursing research informatics", location: "Remote" },
@@ -18,8 +18,7 @@ const PROFILE_DEFAULTS: Record<string, { keywords: string; location: string }> =
 
 function salaryLabel(min: number | null, max: number | null): string {
   if (!min && !max) return "";
-  const fmt = (n: number) =>
-    n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`;
+  const fmt = (n: number) => n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n}`;
   if (min && max) return `${fmt(min)} – ${fmt(max)}`;
   if (min) return `${fmt(min)}+`;
   return `up to ${fmt(max!)}`;
@@ -34,12 +33,13 @@ function daysAgo(posted: string | null): string {
   return `${d}d ago`;
 }
 
-/* ── Job card ── */
-function JobCard({
-  sj,
-  onDismiss,
-  onAddToPipeline,
-}: {
+function scoreColor(s: number) {
+  if (s >= 0.75) return "var(--green)";
+  if (s >= 0.55) return "var(--amber)";
+  return "var(--red)";
+}
+
+function JobCard({ sj, onDismiss, onAddToPipeline }: {
   sj: SavedJob;
   onDismiss: (id: number) => void;
   onAddToPipeline: (sj: SavedJob) => void;
@@ -48,6 +48,7 @@ function JobCard({
   const { job } = sj;
   const salary = salaryLabel(job.salary_min, job.salary_max);
   const age = daysAgo(job.posted_at);
+  const sc = sj.score != null ? scoreColor(sj.score) : null;
 
   return (
     <motion.div
@@ -55,35 +56,32 @@ function JobCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="rounded-xl flex flex-col"
       style={{
-        background: "#0e1015",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-lg)",
       }}
     >
-      {/* Main row */}
       <div className="flex items-start gap-3 p-4">
         {/* Score badge */}
-        {sj.score != null && (
+        {sj.score != null && sc && (
           <div
-            className="shrink-0 flex items-center justify-center rounded-lg font-mono font-bold text-[0.7rem] tabular-nums"
             style={{
-              width: 36,
-              height: 36,
-              background:
-                sj.score >= 0.85
-                  ? "rgba(var(--accent-rgb),0.12)"
-                  : "rgba(255,255,255,0.04)",
-              color:
-                sj.score >= 0.85
-                  ? "var(--accent)"
-                  : sj.score >= 0.7
-                    ? "#f1f1f3"
-                    : "#484d63",
-              border:
-                sj.score >= 0.85
-                  ? "1px solid rgba(var(--accent-rgb),0.3)"
-                  : "1px solid rgba(255,255,255,0.06)",
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              borderRadius: "var(--radius)",
+              background: `${sc}18`,
+              border: `1px solid ${sc}35`,
+              color: sc,
+              fontFamily: MONO,
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              fontVariantNumeric: "tabular-nums",
+              textShadow: `0 0 8px ${sc}`,
             }}
           >
             {Math.round(sj.score * 100)}
@@ -93,15 +91,39 @@ function JobCard({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-[0.85rem] font-semibold text-[#f1f1f3] truncate">{job.title}</span>
-            {age && <span className="text-[0.6rem] text-[#484d63] shrink-0">{age}</span>}
+            <span
+              style={{
+                fontSize: "0.9rem",
+                fontWeight: 550,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.012em",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "100%",
+              }}
+            >
+              {job.title}
+            </span>
+            {age && (
+              <span
+                style={{ fontFamily: MONO, fontSize: "0.6rem", color: "var(--text-muted)", letterSpacing: "0.04em", flexShrink: 0 }}
+              >
+                {age}
+              </span>
+            )}
           </div>
-          <div className="text-[0.7rem] text-[#8b8fa8] mt-0.5">
+          <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)", marginTop: 2 }}>
             {job.company}
-            {job.location && <span className="ml-2 text-[#484d63]"><MapPin size={9} className="inline mr-0.5" />{job.location}</span>}
+            {job.location && (
+              <span style={{ marginLeft: 8, color: "var(--text-muted)" }}>
+                <MapPin size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 2 }} />
+                {job.location}
+              </span>
+            )}
           </div>
           {salary && (
-            <div className="flex items-center gap-1 mt-1 text-[0.65rem]" style={{ color: "var(--accent)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4, fontSize: "0.72rem", color: "var(--green)" }}>
               <DollarSign size={10} />
               {salary}
             </div>
@@ -109,11 +131,17 @@ function JobCard({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="p-1.5 rounded-lg transition-all hover:text-[#f1f1f3]"
-            style={{ color: "#484d63", background: "rgba(255,255,255,0.04)" }}
+            style={{
+              padding: "6px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--border)",
+              background: "var(--surface-2)",
+              color: "var(--text-tertiary)",
+              cursor: "pointer",
+            }}
             title="Toggle description"
           >
             {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
@@ -123,8 +151,14 @@ function JobCard({
               href={job.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-lg transition-all hover:text-[var(--accent)]"
-              style={{ color: "#484d63", background: "rgba(255,255,255,0.04)" }}
+              style={{
+                display: "flex",
+                padding: "6px",
+                borderRadius: "var(--radius-sm)",
+                border: "1px solid var(--border)",
+                background: "var(--surface-2)",
+                color: "var(--text-tertiary)",
+              }}
               title="Open posting"
             >
               <ExternalLink size={13} />
@@ -132,15 +166,30 @@ function JobCard({
           )}
           <button
             onClick={() => onAddToPipeline(sj)}
-            className="px-2.5 py-1.5 rounded-lg text-[0.65rem] font-semibold transition-all hover:-translate-y-0.5"
-            style={{ background: "rgba(var(--accent-rgb),0.12)", color: "var(--accent)", border: "1px solid rgba(var(--accent-rgb),0.25)" }}
+            style={{
+              padding: "6px 12px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid rgba(122,255,142,0.25)",
+              background: "var(--accent-soft)",
+              color: "var(--accent)",
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              letterSpacing: "-0.01em",
+            }}
           >
             + Pipeline
           </button>
           <button
             onClick={() => onDismiss(sj.id)}
-            className="p-1.5 rounded-lg transition-all hover:text-[#ef4444]"
-            style={{ color: "#484d63", background: "rgba(255,255,255,0.04)" }}
+            style={{
+              padding: "6px",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--border)",
+              background: "var(--surface-2)",
+              color: "var(--text-muted)",
+              cursor: "pointer",
+            }}
             title="Dismiss"
           >
             <X size={13} />
@@ -155,14 +204,26 @@ function JobCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
+            transition={{ duration: 0.18 }}
+            style={{ overflow: "hidden" }}
           >
             <div
-              className="px-4 pb-4 text-[0.72rem] text-[#8b8fa8] leading-relaxed border-t"
-              style={{ borderColor: "rgba(255,255,255,0.05)" }}
+              style={{
+                padding: "12px 16px 16px",
+                borderTop: "1px solid var(--border)",
+                fontSize: "0.78rem",
+                color: "var(--text-tertiary)",
+                lineHeight: 1.7,
+              }}
             >
-              <div className="mt-3 line-clamp-6">{job.description}</div>
+              <div style={{
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 6,
+                WebkitBoxOrient: "vertical",
+              }}>
+                {job.description}
+              </div>
             </div>
           </motion.div>
         )}
@@ -171,58 +232,82 @@ function JobCard({
   );
 }
 
-/* ── Search bar ── */
-function SearchBar({
-  keywords, setKeywords, location, setLocation, onFetch, loading,
-}: {
+function SearchBar({ keywords, setKeywords, location, setLocation, onFetch, loading }: {
   keywords: string; setKeywords: (v: string) => void;
   location: string; setLocation: (v: string) => void;
   onFetch: () => void; loading: boolean;
 }) {
   return (
     <div
-      className="flex items-center gap-2 rounded-xl px-3 py-2.5"
-      style={{ background: "#0e1015", border: "1px solid rgba(255,255,255,0.08)" }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 14px",
+        borderRadius: "var(--radius-lg)",
+        background: "var(--surface)",
+        border: "1px solid var(--border-strong)",
+      }}
     >
-      <Search size={14} style={{ color: "#484d63", flexShrink: 0 }} />
+      <Search size={14} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
       <input
         value={keywords}
         onChange={(e) => setKeywords(e.target.value)}
         placeholder="Keywords…"
-        className="flex-1 bg-transparent text-[0.78rem] text-[#f1f1f3] outline-none placeholder:text-[#484d63]"
+        style={{
+          flex: 1,
+          background: "transparent",
+          fontSize: "0.875rem",
+          color: "var(--text-primary)",
+          outline: "none",
+          letterSpacing: "-0.01em",
+        }}
         onKeyDown={(e) => e.key === "Enter" && onFetch()}
       />
-      <div className="w-px h-4" style={{ background: "rgba(255,255,255,0.08)" }} />
-      <MapPin size={12} style={{ color: "#484d63", flexShrink: 0 }} />
+      <div style={{ width: 1, height: 16, background: "var(--border-strong)" }} />
+      <MapPin size={12} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
       <input
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         placeholder="Location…"
-        className="w-32 bg-transparent text-[0.78rem] text-[#f1f1f3] outline-none placeholder:text-[#484d63]"
+        style={{
+          width: 130,
+          background: "transparent",
+          fontSize: "0.875rem",
+          color: "var(--text-primary)",
+          outline: "none",
+          letterSpacing: "-0.01em",
+        }}
         onKeyDown={(e) => e.key === "Enter" && onFetch()}
       />
       <button
         onClick={onFetch}
         disabled={loading}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.68rem] font-semibold transition-all disabled:opacity-50 hover:-translate-y-0.5"
-        style={{ background: "var(--accent)", color: "#000" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "7px 16px",
+          borderRadius: "var(--radius)",
+          background: "var(--accent)",
+          color: "var(--accent-text)",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          letterSpacing: "-0.01em",
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.6 : 1,
+          border: "none",
+        }}
       >
-        <RefreshCw size={11} className={loading ? "animate-spin" : ""} />
-        {loading ? "Fetching…" : "Fetch Jobs"}
+        <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+        {loading ? "Fetching…" : "Fetch jobs"}
       </button>
     </div>
   );
 }
 
-/* ── Add to pipeline modal ── */
-function AddToPipelineModal({
-  sj,
-  profileId,
-  onClose,
-}: {
-  sj: SavedJob;
-  profileId: number;
-  onClose: () => void;
+function AddToPipelineModal({ sj, profileId, onClose }: {
+  sj: SavedJob; profileId: number; onClose: () => void;
 }) {
   const qc = useQueryClient();
   const { mutate, isPending } = useMutation({
@@ -246,8 +331,16 @@ function AddToPipelineModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.75)",
+        backdropFilter: "blur(6px)",
+      }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <motion.div
@@ -255,34 +348,60 @@ function AddToPipelineModal({
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 12 }}
         style={{
-          background: "#0e1015",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 16,
-          padding: "1.75rem",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border-strong)",
+          borderRadius: "var(--radius-xl)",
+          padding: "28px",
           width: 380,
+          boxShadow: "var(--shadow-lg)",
         }}
       >
         <div className="flex items-start justify-between mb-4">
-          <span className="text-[0.9rem] font-semibold text-[#f1f1f3]">Add to Pipeline</span>
-          <button onClick={onClose} style={{ color: "#484d63" }}><X size={16} /></button>
+          <span className="chrome">Add to pipeline</span>
+          <button onClick={onClose} style={{ color: "var(--text-muted)" }}><X size={16} /></button>
         </div>
-        <div className="mb-1 text-[0.82rem] font-medium text-[#f1f1f3]">{sj.job.title}</div>
-        <div className="text-[0.7rem] text-[#484d63] mb-5">{sj.job.company}</div>
-        <div className="flex gap-2">
+        <div
+          style={{ fontSize: "0.95rem", fontWeight: 550, color: "var(--text-primary)", letterSpacing: "-0.015em", marginBottom: 4 }}
+        >
+          {sj.job.title}
+        </div>
+        <div style={{ fontSize: "0.8rem", color: "var(--text-tertiary)", marginBottom: 24 }}>
+          {sj.job.company}
+        </div>
+        <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg py-2 text-[0.72rem] font-medium"
-            style={{ background: "rgba(255,255,255,0.04)", color: "#8b8fa8", border: "1px solid rgba(255,255,255,0.07)" }}
+            style={{
+              flex: 1,
+              padding: "9px",
+              borderRadius: "var(--radius)",
+              background: "var(--surface-3)",
+              color: "var(--text-secondary)",
+              border: "1px solid var(--border)",
+              fontSize: "0.8rem",
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
           >
             Cancel
           </button>
           <button
             onClick={() => mutate()}
             disabled={isPending}
-            className="flex-1 rounded-lg py-2 text-[0.72rem] font-bold transition-all disabled:opacity-40"
-            style={{ background: "var(--accent)", color: "#000" }}
+            style={{
+              flex: 1,
+              padding: "9px",
+              borderRadius: "var(--radius)",
+              background: "var(--accent)",
+              color: "var(--accent-text)",
+              border: "none",
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              cursor: isPending ? "not-allowed" : "pointer",
+              opacity: isPending ? 0.6 : 1,
+            }}
           >
-            {isPending ? "Adding…" : "Add to Pipeline"}
+            {isPending ? "Adding…" : "Add to pipeline"}
           </button>
         </div>
       </motion.div>
@@ -290,7 +409,6 @@ function AddToPipelineModal({
   );
 }
 
-/* ── Main page ── */
 export default function FeedPage() {
   const profile = useProfile();
   const profileId = profile?.id;
@@ -312,8 +430,7 @@ export default function FeedPage() {
   });
 
   const { mutate: fetchJobs, isPending: fetching } = useMutation({
-    mutationFn: () =>
-      api.jobs.fetch({ profile_id: profileId!, keywords, location }),
+    mutationFn: () => api.jobs.fetch({ profile_id: profileId!, keywords, location }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs", profileId] }),
   });
 
@@ -322,9 +439,7 @@ export default function FeedPage() {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: ["jobs", profileId] });
       const prev = qc.getQueryData<SavedJob[]>(["jobs", profileId]);
-      qc.setQueryData<SavedJob[]>(["jobs", profileId], (old) =>
-        old?.filter((j) => j.id !== id) ?? []
-      );
+      qc.setQueryData<SavedJob[]>(["jobs", profileId], (old) => old?.filter((j) => j.id !== id) ?? []);
       return { prev };
     },
     onError: (_e, _v, ctx) => {
@@ -334,24 +449,23 @@ export default function FeedPage() {
   });
 
   return (
-    <div className="flex flex-col h-full gap-5">
-
+    <div className="flex flex-col gap-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-end justify-between shrink-0"
-      >
-        <div>
-          <h1 className="text-[1.9rem] font-bold tracking-[-0.03em] text-[#f1f1f3]">Job Feed</h1>
+      <header>
+        <div className="flex items-center justify-between mb-1">
+          <span className="chrome">Job feed</span>
+          <span
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.65rem",
+              color: "var(--text-muted)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            {jobs.length} role{jobs.length !== 1 ? "s" : ""} in feed
+          </span>
         </div>
-        <div className="text-[0.68rem] text-[#484d63]">
-          {jobs.length} role{jobs.length !== 1 ? "s" : ""} in feed
-        </div>
-      </motion.div>
-
-      {/* Search */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
+        <h1 style={{ marginBottom: 16 }}>Incoming signals.</h1>
         <SearchBar
           keywords={keywords}
           setKeywords={setKeywords}
@@ -360,22 +474,51 @@ export default function FeedPage() {
           onFetch={() => fetchJobs()}
           loading={fetching}
         />
-      </motion.div>
+      </header>
 
       {/* Feed */}
-      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         {isLoading && (
-          <div className="flex items-center justify-center h-32 text-[0.7rem] text-[#484d63]">Loading…</div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 128,
+              color: "var(--text-muted)",
+              fontFamily: MONO,
+              fontSize: "0.7rem",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Loading…
+          </div>
         )}
 
         {!isLoading && jobs.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center h-40 gap-3"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 160,
+              gap: 12,
+            }}
           >
-            <Briefcase size={28} style={{ color: "#2a2d3a" }} />
-            <div className="text-[0.75rem] text-[#484d63]">No jobs yet — hit Fetch Jobs to populate your feed.</div>
+            <Briefcase size={28} style={{ color: "var(--text-muted)" }} />
+            <div
+              style={{
+                fontFamily: MONO,
+                fontSize: "0.72rem",
+                color: "var(--text-muted)",
+                letterSpacing: "0.04em",
+              }}
+            >
+              No jobs yet — hit Fetch jobs to populate your feed.
+            </div>
           </motion.div>
         )}
 
@@ -391,7 +534,6 @@ export default function FeedPage() {
         </AnimatePresence>
       </div>
 
-      {/* Modals */}
       <AnimatePresence>
         {addTarget && profileId && (
           <AddToPipelineModal
