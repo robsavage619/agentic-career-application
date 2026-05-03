@@ -20,6 +20,13 @@ class _TextNode:
     is_header: bool
 
 
+def extract_lines(docx_bytes: bytes) -> list[str]:
+    """Public: extract non-empty text lines from a DOCX file. Used for diff views."""
+    from io import BytesIO
+    doc = Document(BytesIO(docx_bytes))
+    return [n.text for n in _extract_nodes(doc)]
+
+
 def _extract_nodes(doc: Document) -> list[_TextNode]:
     """Walk paragraphs and table cells, return all non-empty text nodes."""
     nodes: list[_TextNode] = []

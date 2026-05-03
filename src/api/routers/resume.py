@@ -155,3 +155,55 @@ def download_version(version_id: int, session: Session = Depends(get_session)) -
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": f"attachment; filename=resume_v{version_id}.docx"},
     )
+
+
+@router.get("/versions/{version_id}/diff")
+def diff_version(version_id: int, session: Session = Depends(get_session)) -> dict:
+    """Return a line-pair diff between the base resume and this version."""
+    from difflib import SequenceMatcher
+
+    from api.models.resume import BaseResume
+    from api.services.resume_engine import extract_lines
+
+    v = session.get(ResumeVersion, version_id)
+    if not v:
+        raise HTTPException(status_code=404, detail="Version not found")
+    base = session.get(BaseResume, v.base_resume_id)
+    if not base:
+        raise HTTPException(status_code=404, detail="Base resume not found")
+
+    base_lines = extract_lines(base.docx_bytes)
+    new_lines = extract_lines(v.docx_bytes)
+
+    pairs: list[dict] = []
+    matcher = SequenceMatcher(a=base_lines, b=new_lines, autojunk=False)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            for k in range(i2 - i1):
+                pairs.append({"kind": "unchanged", "base": base_lines[i1 + k], "version": new_lines[j1 + k]})
+        elif tag == "replace":
+            # Pair up changed lines positionally; pad with blanks if lengths differ
+            ll = max(i2 - i1, j2 - j1)
+            for k in range(ll):
+                pairs.append({
+                    "kind": "changed",
+                    "base": base_lines[i1 + k] if k < (i2 - i1) else "",
+                    "version": new_lines[j1 + k] if k < (j2 - j1) else "",
+                })
+        elif tag == "delete":
+            for k in range(i2 - i1):
+                pairs.append({"kind": "removed", "base": base_lines[i1 + k], "version": ""})
+        elif tag == "insert":
+            for k in range(j2 - j1):
+                pairs.append({"kind": "added", "base": "", "version": new_lines[j1 + k]})
+
+    changes = sum(1 for p in pairs if p["kind"] != "unchanged")
+    return {
+        "base_id": base.id,
+        "version_id": v.id,
+        "created_at": v.created_at.isoformat(),
+        "jd_snapshot": v.jd_snapshot,
+        "pairs": pairs,
+        "changes": changes,
+        "total": len(pairs),
+    }

@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, Download, Trash2, Sparkles, FileText, ChevronRight, Clock } from "lucide-react";
+import Link from "next/link";
+import { Upload, Download, Trash2, Sparkles, FileText, ChevronRight, Clock, GitCompare } from "lucide-react";
 import { api, type BaseResume, type ResumeVersion } from "@/lib/api";
 import { useProfile } from "@/lib/hooks/use-profile";
 
@@ -56,11 +57,19 @@ function VersionRow({ version }: { version: ResumeVersion }) {
           })}
         </div>
       </div>
+      <Link
+        href={`/resume/diff/${version.id}`}
+        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.62rem] font-semibold transition-all"
+        style={{ background: "transparent", color: "var(--text-tertiary)", border: "1px solid var(--border)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GitCompare size={10} /> DIFF
+      </Link>
       <a
         href={api.resume.downloadUrl(version.id)}
         download
         className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.62rem] font-semibold transition-all hover:-translate-y-0.5"
-        style={{ background: "rgba(var(--accent-rgb),0.1)", color: "var(--accent)", border: "1px solid rgba(var(--accent-rgb),0.2)" }}
+        style={{ background: "rgba(122,255,142,0.1)", color: "var(--accent)", border: "1px solid rgba(122,255,142,0.2)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <Download size={10} /> DOCX

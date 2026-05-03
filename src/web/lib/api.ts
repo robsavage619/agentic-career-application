@@ -174,6 +174,22 @@ export type ResumeVersion = {
   created_at: string;
 };
 
+export type ResumeDiffPair = {
+  kind: "unchanged" | "changed" | "added" | "removed";
+  base: string;
+  version: string;
+};
+
+export type ResumeDiffResult = {
+  base_id: number;
+  version_id: number;
+  created_at: string;
+  jd_snapshot: string;
+  pairs: ResumeDiffPair[];
+  changes: number;
+  total: number;
+};
+
 // ── Briefing / Fit / Decisions ─────────────────────────────────────────────
 
 export type BriefingJob = {
@@ -298,6 +314,7 @@ export const api = {
     generate: (data: { base_resume_id: number; job_description: string; pipeline_card_id?: number | null }) =>
       request<ResumeVersion>("/api/resume/generate", { method: "POST", body: JSON.stringify(data) }),
     downloadUrl: (versionId: number) => `${BASE}/api/resume/versions/${versionId}/download`,
+    diff: (versionId: number) => request<ResumeDiffResult>(`/api/resume/versions/${versionId}/diff`),
   },
   letters: {
     list: (profileId: number) => request<CoverLetter[]>(`/api/cover-letter/?profile_id=${profileId}`),
