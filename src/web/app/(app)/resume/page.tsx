@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
@@ -86,6 +86,22 @@ export default function ResumePage() {
   const [selectedBaseId, setSelectedBaseId] = useState<number | null>(null);
   const [jd, setJd] = useState("");
   const [generating, setGenerating] = useState(false);
+
+  // Pre-fill JD from analyzer/pipeline handoff
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const fromJd = sp.get("jd");
+    if (fromJd && !jd) setJd(decodeURIComponent(fromJd));
+    const cardId = sp.get("card");
+    if (cardId && !jd && profileId) {
+      api.pipeline.list(profileId).then((cards) => {
+        const card = cards.find((c) => c.id === Number(cardId));
+        if (card?.notes) setJd(card.notes);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileId]);
 
   const { data: rawBases } = useQuery({
     queryKey: ["resume-bases", profileId],

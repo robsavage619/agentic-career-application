@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Trash2, Sparkles, Clock, Plus } from "lucide-react";
@@ -56,6 +56,28 @@ function GenerateForm({
   const [jd, setJd] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [draft, setDraft] = useState("");
+
+  // Pre-fill from analyzer/pipeline handoff
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const fromJd = sp.get("jd");
+    if (fromJd && !jd) setJd(decodeURIComponent(fromJd));
+    const fromTitle = sp.get("title");
+    if (fromTitle && !title) setTitle(decodeURIComponent(fromTitle));
+    const cardId = sp.get("card");
+    if (cardId && !jd) {
+      api.pipeline.list(profileId).then((cards) => {
+        const card = cards.find((c) => c.id === Number(cardId));
+        if (card) {
+          if (card.notes && !jd) setJd(card.notes);
+          if (card.title && !title) setTitle(card.title);
+          if (card.company && !company) setCompany(card.company);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileId]);
 
   async function generate() {
     if (!title || !company || !jd.trim()) return;
