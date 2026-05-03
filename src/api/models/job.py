@@ -26,4 +26,6 @@ class SavedJob(SQLModel, table=True):
     job_id: int = Field(foreign_key="job.id")
     score: float | None = None
     dismissed: bool = False
+    dismiss_reason: str = ""  # one-line "why" captured when dismissed; feeds preference learning
+    decided_at: datetime | None = None  # when dismiss/save was last toggled
     saved_at: datetime = Field(default_factory=datetime.utcnow)

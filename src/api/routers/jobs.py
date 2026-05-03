@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, SQLModel, select
 
@@ -104,12 +106,32 @@ def _upsert_and_save(raw: list[dict], profile_id: int, session: Session) -> int:
     return new_count
 
 
+class DismissRequest(SQLModel):
+    reason: str = ""
+
+
+class DecisionLogEntry(SQLModel):
+    saved_job_id: int
+    job_id: int
+    title: str
+    company: str
+    decision: str  # "dismissed" | "saved"
+    reason: str
+    decided_at: str
+
+
 @router.patch("/{saved_job_id}/dismiss")
-def dismiss_job(saved_job_id: int, session: Session = Depends(get_session)) -> dict:
+def dismiss_job(
+    saved_job_id: int,
+    data: DismissRequest | None = None,
+    session: Session = Depends(get_session),
+) -> dict:
     sj = session.get(SavedJob, saved_job_id)
     if not sj:
         raise HTTPException(status_code=404, detail="Not found")
     sj.dismissed = True
+    sj.dismiss_reason = (data.reason if data else "").strip()
+    sj.decided_at = datetime.utcnow()
     session.add(sj)
     session.commit()
     return {"ok": True}
@@ -121,6 +143,45 @@ def save_job(saved_job_id: int, session: Session = Depends(get_session)) -> dict
     if not sj:
         raise HTTPException(status_code=404, detail="Not found")
     sj.dismissed = False
+    sj.dismiss_reason = ""
+    sj.decided_at = datetime.utcnow()
     session.add(sj)
     session.commit()
     return {"ok": True}
+
+
+@router.get("/decisions", response_model=list[DecisionLogEntry])
+def list_decisions(
+    profile_id: int,
+    limit: int = 50,
+    session: Session = Depends(get_session),
+) -> list[DecisionLogEntry]:
+    """Application decision log: most recent dismiss/save decisions, newest first.
+
+    Useful as feedback to the agent (preference learning) and as a "why did I
+    pass on that?" record for the user.
+    """
+    rows = session.exec(
+        select(SavedJob, Job)
+        .join(Job, SavedJob.job_id == Job.id)  # type: ignore[arg-type]
+        .where(SavedJob.profile_id == profile_id)
+        .where(SavedJob.decided_at.is_not(None))  # type: ignore[union-attr]
+        .order_by(SavedJob.decided_at.desc())  # type: ignore[union-attr]
+        .limit(limit)
+    ).all()
+    out: list[DecisionLogEntry] = []
+    for sj, job in rows:
+        if sj.id is None or job.id is None or sj.decided_at is None:
+            continue
+        out.append(
+            DecisionLogEntry(
+                saved_job_id=sj.id,
+                job_id=job.id,
+                title=job.title,
+                company=job.company,
+                decision="dismissed" if sj.dismissed else "saved",
+                reason=sj.dismiss_reason,
+                decided_at=sj.decided_at.isoformat(),
+            )
+        )
+    return out
