@@ -68,6 +68,30 @@ def _set_cell_text(cell: _Cell, original: str, new_text: str) -> None:
             return
 
 
+def apply_line_replacements(
+    docx_bytes: bytes,
+    line_replacements: dict[int, str],
+) -> bytes:
+    """Apply chat-supplied line edits to a DOCX while preserving formatting.
+
+    `line_replacements` maps 0-indexed line position (matching `extract_lines`)
+    to the new text. Lines not in the dict are left untouched.
+    """
+    doc = Document(io.BytesIO(docx_bytes))
+    nodes = _extract_nodes(doc)
+    for i, node in enumerate(nodes):
+        if i not in line_replacements:
+            continue
+        new_text = line_replacements[i]
+        if isinstance(node.obj, Paragraph):
+            _set_paragraph_text(node.obj, new_text)
+        else:
+            _set_cell_text(node.obj, node.text, new_text)
+    buf = io.BytesIO()
+    doc.save(buf)
+    return buf.getvalue()
+
+
 async def rewrite(
     docx_bytes: bytes,
     job_description: str,
