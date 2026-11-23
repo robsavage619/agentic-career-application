@@ -13,6 +13,8 @@ powered by a LangGraph agent over your own Obsidian knowledge base.
 
 ---
 
+> **It never sends anything to an employer.** It drafts and scores; I edit and apply myself. There is no auto-apply code in this repo.
+
 ## Why this exists
 
 A career search produces dozens of half-finished tabs: postings on five sites, a résumé per role,
@@ -310,6 +312,10 @@ A full roadmap and feature catalog lives in
 | Migrations | 2 (initial schema · savedjob decision log) |
 
 ---
+
+## How this was built
+
+I use this for my own search. Claude Code wrote most of the code, which the commit trailers show. The agent is built so every advisory answer has to consult my own notes first, and anything it drafts is something I read and edit before it goes anywhere.
 
 ## License
 
